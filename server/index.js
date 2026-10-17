@@ -24,6 +24,7 @@ import rateLimit from 'express-rate-limit';
 
 import { saveEnquiry } from './store.js';
 import { deliverEnquiry, mailerConfigured } from './mailer.js';
+import { supabaseConfigured } from './supabase.js';
 import { MAX_BODY_BYTES, validateEnquiry } from './validation.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -175,6 +176,14 @@ app.use((error, req, res, next) => {
 
 const server = app.listen(PORT, () => {
   console.log(`[api] Special Learns enquiry API listening on http://127.0.0.1:${PORT}`);
+
+  if (!supabaseConfigured()) {
+    console.log(
+      '[api] Supabase storage is OFF — set SUPABASE_URL and SUPABASE_KEY in .env to sync enrolments to Supabase.',
+    );
+  } else {
+    console.log('[api] Supabase storage is ON — enrolments will be synced to Supabase.');
+  }
 
   if (!mailerConfigured()) {
     console.log(

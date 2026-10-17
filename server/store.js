@@ -16,6 +16,8 @@ export async function readEnquiries() {
   }
 }
 
+import { saveToSupabase, supabaseConfigured } from './supabase.js';
+
 export function saveEnquiry(enquiry) {
   const operation = pending.then(async () => {
     if (enquiry.requestKey) {
@@ -34,8 +36,17 @@ export function saveEnquiry(enquiry) {
     const file = await open(ENQUIRY_FILE, 'a', 0o600);
     try { await file.writeFile(`${JSON.stringify(enquiry)}\n`, 'utf8'); await file.sync(); }
     finally { await file.close(); }
+
+    // Sync to Supabase in background so caller receives immediate receipt
+    if (supabaseConfigured()) {
+      saveToSupabase(enquiry).catch(err => {
+        console.error('[supabase] Async sync error:', err.message || err);
+      });
+    }
+
     return { enquiry, created: true };
   });
   pending = operation.catch(() => {});
   return operation;
 }
+
