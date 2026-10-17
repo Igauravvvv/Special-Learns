@@ -1,0 +1,259 @@
+/*
+   Reveal on scroll
+   -----------------
+   Content is VISIBLE by default. The hidden start state is only applied when
+   the document is marked JS-capable (see the inline script in index.html), so
+   a failed or blocked bundle degrades to fully readable content rather than a
+   page stuck at opacity 0.
+   ========================================================================== */
+
+.reveal {
+  transition:
+    opacity 620ms var(--sl-ease-out),
+    transform 620ms var(--sl-ease-out),
+    filter 620ms var(--sl-ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+html.js .reveal:not(.is-visible) {
+  opacity: 0;
+}
+
+html.js .reveal--up:not(.is-visible) {
+  transform: translateY(26px);
+}
+
+html.js .reveal--fade:not(.is-visible) {
+  transform: none;
+}
+
+html.js .reveal--scale:not(.is-visible) {
+  transform: scale(0.94);
+}
+
+html.js .reveal--left:not(.is-visible) {
+  transform: translateX(-32px);
+}
+
+html.js .reveal--right:not(.is-visible) {
+  transform: translateX(32px);
+}
+
+html.js .reveal--blur:not(.is-visible) {
+  transform: translateY(18px);
+  filter: blur(6px);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* Reduced motion: show everything, no transitions. */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  html.js .reveal:not(.is-visible) {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+}
+
+/* ==========================================================================
+   Word-by-word heading reveal
+   ========================================================================== */
+
+.split-head {
+  display: block;
+}
+
+html.js .split-head__word:not(.is-started) {
+  opacity: 0;
+}
+
+html.js .split-head:not(.is-started) .split-head__word {
+  opacity: 0;
+  transform: translateY(0.5em) rotate(1.4deg);
+}
+
+.split-head__word {
+  display: inline-block;
+  transition:
+    opacity 520ms var(--sl-ease-out),
+    transform 600ms var(--sl-ease-out);
+  transition-delay: var(--word-delay, 0ms);
+}
+
+.split-head.is-started .split-head__word {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .split-head__word,
+  html.js .split-head:not(.is-started) .split-head__word {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ==========================================================================
+   Ambient motion
+   ========================================================================== */
+
+/* Slow, irregular drift for decorative doodles. */
+@keyframes doodle-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  33% {
+    transform: translate3d(6px, -12px, 0) rotate(5deg);
+  }
+  66% {
+    transform: translate3d(-7px, -6px, 0) rotate(-4deg);
+  }
+}
+
+/* Gentle breathing for the hero artwork. */
+@keyframes doodle-bob {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -10px, 0);
+  }
+}
+
+/* Organic blob morph used behind hero and CTA sections. */
+@keyframes blob-morph {
+  0%,
+  100% {
+    border-radius: 46% 54% 61% 39% / 55% 41% 59% 45%;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    border-radius: 61% 39% 44% 56% / 38% 62% 38% 62%;
+    transform: translate3d(0, -14px, 0) scale(1.03);
+  }
+  66% {
+    border-radius: 38% 62% 57% 43% / 62% 38% 62% 38%;
+    transform: translate3d(10px, 8px, 0) scale(0.98);
+  }
+}
+
+/* Shine sweep across primary buttons on hover. */
+@keyframes shine-sweep {
+  from {
+    transform: translateX(-140%) skewX(-18deg);
+  }
+  to {
+    transform: translateX(240%) skewX(-18deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .doodle-float,
+  .doodle-bob,
+  .blob-morph {
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   Scroll progress bar
+   ========================================================================== */
+
+.scroll-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(
+    90deg,
+    var(--sl-indigo-500),
+    var(--sl-blue-400) 55%,
+    var(--sl-yellow-400)
+  );
+  opacity: 0;
+  transition: opacity var(--sl-dur) var(--sl-ease);
+  will-change: transform;
+}
+
+.scroll-progress[data-active='true'] {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   Marquee
+   ========================================================================== */
+
+.marquee {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.marquee__track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll var(--marquee-duration, 38s) linear infinite;
+  will-change: transform;
+}
+
+@keyframes marquee-scroll {
+  /* The track holds two copies of the list, so -50% is exactly one loop. */
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee:hover .marquee__track,
+.marquee:focus-within .marquee__track {
+  animation-play-state: paused;
+}
+
+.marquee__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sl-5);
+  padding-right: var(--sl-5);
+  white-space: nowrap;
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.35rem);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--sl-plum-800);
+  opacity: 0.82;
+}
+
+.marquee__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sl-coral);
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee__track {
+    animation: none;
+    transform: none;
+  }
+
+  .marquee {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}

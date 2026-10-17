@@ -1,0 +1,879 @@
+/* ==========================================================================
+   Layout primitives + page chrome (nav, footer) + section rhythm
+   ========================================================================== */
+
+/* ---------- Containers ---------------------------------------------------- */
+
+.container {
+  width: 100%;
+  max-width: var(--sl-maxw);
+  margin-inline: auto;
+  padding-inline: var(--sl-gutter);
+}
+
+.container--wide {
+  max-width: var(--sl-maxw-wide);
+}
+
+.container--narrow {
+  max-width: 860px;
+}
+
+/* ---------- Sections ------------------------------------------------------ */
+
+.section {
+  padding-block: var(--sl-section-y);
+  position: relative;
+}
+
+.section--tight {
+  padding-block: clamp(2.75rem, 1.8rem + 4vw, 4.5rem);
+}
+
+.section--mint {
+  background: var(--sl-mint-300);
+}
+
+.section--mint-soft {
+  background: var(--sl-mint-100);
+}
+
+.section--cream {
+  background: var(--sl-cream-300);
+}
+
+.section--cream-soft {
+  background: var(--sl-cream-200);
+}
+
+.section--alt {
+  background: var(--sl-surface-alt);
+}
+
+.section--plum {
+  background: var(--sl-plum-800);
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.section--plum h1,
+.section--plum h2,
+.section--plum h3,
+.section--plum h4,
+.section--plum h5 {
+  color: var(--sl-white);
+}
+
+/* ---------- Section header ------------------------------------------------ */
+
+.section-head {
+  max-width: 720px;
+  margin-inline: auto;
+  text-align: center;
+  margin-bottom: clamp(2rem, 1.4rem + 2.4vw, 3.25rem);
+}
+
+.section-head--left {
+  margin-inline: 0;
+  text-align: left;
+}
+
+.section-head p {
+  margin-top: var(--sl-4);
+  font-size: var(--sl-fs-lead);
+  color: var(--sl-text);
+}
+
+/* Anchors the decorative underline beneath the heading, and reserves the
+   space it occupies so it never collides with the copy below. */
+.section-head h2 {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 26px;
+}
+
+/* Self-drawing underline: the marker stroke sweeps in once the heading lands. */
+.section-head__title {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 30px;
+}
+
+.section-head__underline {
+  position: absolute;
+  left: 50%;
+  bottom: -22px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.section-head--left .section-head__underline {
+  left: 0;
+  transform: none;
+}
+
+.section-head__underline svg path {
+  stroke-dasharray: 260;
+  stroke-dashoffset: 260;
+  animation: doodle-underline 780ms var(--sl-ease-out) 260ms forwards;
+}
+
+@keyframes doodle-underline {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-head__underline svg path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+/*
+ * The eyebrow is an inline-flex pill, which would otherwise flow onto the
+ * same line as the inline-block heading. Forcing it to a block-level flex
+ * box of its own gives it a dedicated line and lets us centre it.
+ */
+.section-head .eyebrow {
+  display: flex;
+  width: fit-content;
+  margin-inline: auto;
+}
+
+.section-head--left .eyebrow {
+  margin-inline: 0;
+}
+
+.section--plum .section-head p {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.section-head__actions {
+  margin-top: var(--sl-6);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-3);
+  justify-content: center;
+}
+
+.section-head--left .section-head__actions {
+  justify-content: flex-start;
+}
+
+/* ---------- Grids --------------------------------------------------------- */
+
+.grid {
+  display: grid;
+  gap: clamp(1rem, 0.7rem + 1.4vw, 1.5rem);
+}
+
+.grid--2 {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+}
+
+.grid--3 {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 268px), 1fr));
+}
+
+.grid--4 {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 218px), 1fr));
+}
+
+/* Two-column split that collapses cleanly, text column first on mobile. */
+.split {
+  display: grid;
+  gap: clamp(2rem, 1.2rem + 3.4vw, 4rem);
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .split {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .split--media-first > .split__media {
+    order: -1;
+  }
+
+  .split--wide-text {
+    grid-template-columns: 1.08fr 0.92fr;
+  }
+
+  .split--top {
+    align-items: start;
+  }
+}
+
+/* Anchors decorative overlays and stops absolutely positioned children from
+   escaping the column and causing horizontal overflow. */
+.split__media {
+  position: relative;
+  min-width: 0;
+}
+
+.split__body > * + * {
+  margin-top: var(--sl-5);
+}
+
+.split__body > .section-head {
+  margin-bottom: 0;
+}
+
+/* ---------- Stack / cluster ---------------------------------------------- */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-5);
+}
+
+.stack--sm {
+  gap: var(--sl-3);
+}
+
+.stack--lg {
+  gap: var(--sl-7);
+}
+
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-3);
+  align-items: center;
+}
+
+.center {
+  text-align: center;
+}
+
+.mt-auto-push {
+  margin-top: auto;
+}
+
+/* ---------- Logo ----------------------------------------------------------- */
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  border-radius: var(--sl-r-sm);
+  flex-shrink: 0;
+}
+
+.logo__mark {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.logo__full {
+  width: auto;
+  height: 54px;
+}
+
+.logo__name {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.logo__name-main {
+  font-size: 1.0625rem;
+  color: var(--sl-brand-blue);
+}
+
+.logo__name-sub {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sl-text-muted);
+}
+
+.logo__name--light .logo__name-main {
+  color: var(--sl-white);
+}
+
+.logo__name--light .logo__name-sub {
+  color: var(--sl-mint-400);
+}
+
+/* ---------- Navigation ---------------------------------------------------- */
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: var(--sl-z-nav);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--sl-dur) var(--sl-ease),
+    box-shadow var(--sl-dur) var(--sl-ease), background-color var(--sl-dur) var(--sl-ease);
+}
+
+.nav--scrolled {
+  border-bottom-color: var(--sl-line);
+  box-shadow: var(--sl-sh-sm);
+}
+
+.nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sl-4);
+  min-height: var(--sl-nav-h);
+  padding-block: var(--sl-3);
+}
+
+.nav__brand {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+  border-radius: var(--sl-r-sm);
+}
+
+.nav__links {
+  display: none;
+  align-items: center;
+  gap: clamp(0.25rem, -0.3rem + 1.4vw, 0.9rem);
+}
+
+/* Scoped so it outranks `.btn { display: inline-flex }` from components.css,
+   which is loaded later in the cascade. */
+.nav .nav__cta {
+  display: none;
+}
+
+@media (min-width: 880px) {
+  .nav__links {
+    display: flex;
+  }
+
+  .nav .nav__toggle {
+    display: none;
+  }
+}
+
+@media (min-width: 940px) {
+  .nav .nav__cta {
+    display: inline-flex;
+  }
+}
+
+.nav__link {
+  position: relative;
+  display: inline-block;
+  padding: 0.5rem 0.7rem;
+  border-radius: var(--sl-r-sm);
+  color: var(--sl-ink-700);
+  font-size: var(--sl-fs-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color var(--sl-dur-fast) var(--sl-ease),
+    background-color var(--sl-dur-fast) var(--sl-ease);
+}
+
+.nav__link::after {
+  content: '';
+  position: absolute;
+  left: 0.7rem;
+  right: 0.7rem;
+  bottom: 0.22rem;
+  height: 2.5px;
+  border-radius: var(--sl-r-pill);
+  background: var(--sl-indigo-600);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--sl-dur) var(--sl-ease);
+}
+
+.nav__link:hover {
+  color: var(--sl-indigo-700);
+  background: var(--sl-indigo-050);
+}
+
+.nav__link.is-active {
+  color: var(--sl-indigo-700);
+}
+
+.nav__link.is-active::after {
+  transform: scaleX(1);
+}
+
+.nav__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-3);
+  flex-shrink: 0;
+}
+
+.nav__phone {
+  display: none;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--sl-fs-sm);
+  font-weight: 700;
+  color: var(--sl-ink-800);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav__phone svg {
+  color: var(--sl-indigo-600);
+}
+
+@media (min-width: 1120px) {
+  .nav__phone {
+    display: inline-flex;
+  }
+}
+
+/* ---------- Mobile toggle ------------------------------------------------- */
+
+.nav__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  background: var(--sl-mint-200);
+  border: 1px solid var(--sl-line);
+  border-radius: var(--sl-r-sm);
+  color: var(--sl-ink-800);
+  transition: background-color var(--sl-dur-fast) var(--sl-ease);
+}
+
+.nav__toggle:hover {
+  background: var(--sl-mint-300);
+}
+
+/* ---------- Mobile drawer ------------------------------------------------- */
+
+.mobile-menu {
+  position: fixed;
+  inset: 0;
+  z-index: var(--sl-z-menu);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background: var(--sl-white);
+  isolation: isolate;
+  box-shadow: var(--sl-sh-xl);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  animation: menu-in var(--sl-dur) var(--sl-ease-out);
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+.mobile-menu__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sl-4);
+  min-height: var(--sl-nav-h);
+  padding: var(--sl-3) var(--sl-gutter);
+  border-bottom: 1px solid var(--sl-line);
+}
+
+.mobile-menu__top img {
+  height: 38px;
+  width: auto;
+}
+.mobile-menu__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  background: var(--sl-cream-300);
+  border: 1px solid var(--sl-line);
+  border-radius: var(--sl-r-sm);
+  color: var(--sl-ink-800);
+}
+
+.mobile-menu__body {
+  padding: var(--sl-5) var(--sl-gutter) var(--sl-9);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-6);
+}
+
+.mobile-menu__nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-menu__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sl-3);
+  padding: 1rem 0.25rem;
+  border-bottom: 1px solid var(--sl-line);
+  color: var(--sl-ink-800);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.mobile-menu__link.is-active {
+  color: var(--sl-indigo-700);
+}
+
+.mobile-menu__link.is-active .mobile-menu__chev {
+  color: var(--sl-indigo-600);
+}
+
+.mobile-menu__chev {
+  color: var(--sl-ink-400);
+}
+
+.mobile-menu__foot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-3);
+}
+
+.mobile-menu__note {
+  font-size: var(--sl-fs-sm);
+  color: var(--sl-text-muted);
+  line-height: 1.55;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.footer {
+  margin: clamp(1.5rem, 4vw, 3.5rem) var(--sl-gutter) 0;
+  border-radius: var(--sl-r-lg) var(--sl-r-lg) 0 0;
+  background: var(--sl-plum-800);
+  color: rgba(255, 255, 255, 0.74);
+  padding-block: clamp(3rem, 2rem + 4vw, 5rem) var(--sl-6);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Soft decorative glow, purely presentational. */
+.footer::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  right: -10%;
+  width: 46rem;
+  height: 46rem;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(124, 134, 240, 0.22) 0%,
+    rgba(124, 134, 240, 0) 68%
+  );
+  pointer-events: none;
+}
+
+.footer > * {
+  position: relative;
+}
+
+.footer__grid {
+  display: grid;
+  gap: clamp(2rem, 1.4rem + 2.6vw, 3rem);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 560px) {
+  .footer__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1000px) {
+  .footer__grid {
+    grid-template-columns: 1.55fr 1fr 1fr 1.25fr;
+  }
+}
+
+.footer__brand {
+  margin-bottom: var(--sl-4);
+}
+
+.footer__about {
+  margin-top: var(--sl-4);
+  max-width: 26rem;
+  font-size: var(--sl-fs-sm);
+  line-height: 1.65;
+}
+
+.footer__title {
+  color: var(--sl-white);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: var(--sl-4);
+}
+
+.footer__list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-3);
+}
+
+.footer__list a {
+  color: rgba(255, 255, 255, 0.74);
+  font-size: var(--sl-fs-sm);
+  font-weight: 500;
+  text-decoration: none;
+  transition: color var(--sl-dur-fast) var(--sl-ease);
+}
+
+.footer__list a:hover {
+  color: var(--sl-yellow-300);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.footer__contact {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-4);
+  font-size: var(--sl-fs-sm);
+}
+
+.footer__contact li {
+  display: flex;
+  gap: var(--sl-3);
+  align-items: flex-start;
+  line-height: 1.55;
+}
+
+.footer__contact svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--sl-mint-400);
+}
+
+.footer__contact a {
+  color: rgba(255, 255, 255, 0.82);
+  text-decoration: none;
+}
+
+.footer__contact a:hover {
+  color: var(--sl-yellow-300);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.footer__social {
+  display: flex;
+  gap: var(--sl-2);
+  margin-top: var(--sl-5);
+}
+
+.footer__social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--sl-r-sm);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--sl-white);
+  transition: background-color var(--sl-dur-fast) var(--sl-ease),
+    transform var(--sl-dur-fast) var(--sl-ease);
+}
+
+.footer__social a:hover {
+  background: var(--sl-indigo-500);
+  transform: translateY(-2px);
+}
+
+.footer__bar {
+  margin-top: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+  padding-top: var(--sl-5);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-3) var(--sl-5);
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--sl-fs-sm);
+}
+
+.footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-2) var(--sl-5);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer__legal a {
+  color: rgba(255, 255, 255, 0.74);
+  text-decoration: none;
+}
+
+.footer__legal a:hover {
+  color: var(--sl-yellow-300);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.footer__copy {
+  color: rgba(255, 255, 255, 0.56);
+}
+
+/* ==========================================================================
+   Mobile Footer Optimization: Short, compact, and organized
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .footer {
+    margin: 1.25rem 10px 0 !important;
+    border-radius: 20px 20px 0 0 !important;
+    padding-block: 26px 18px !important;
+  }
+
+  .footer__grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 18px 14px !important;
+  }
+
+  /* Brand header: Logo on left, socials on right in a single horizontal row */
+  .footer__col-brand {
+    grid-column: 1 / -1 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding-bottom: 14px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+    margin-bottom: 2px !important;
+  }
+
+  .footer__col-brand .footer__brand {
+    margin-bottom: 0 !important;
+  }
+
+  /* Hide verbose about paragraph on mobile to keep footer vertically short */
+  .footer__about {
+    display: none !important;
+  }
+
+  .footer__social {
+    margin-top: 0 !important;
+    gap: 6px !important;
+  }
+
+  .footer__social a {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 8px !important;
+  }
+
+  .footer__social svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  /* Explore (col 1) & Course areas (col 2) side-by-side in 2 compact columns */
+  .footer__col-nav {
+    grid-column: 1 / 2 !important;
+  }
+
+  .footer__col-programs {
+    grid-column: 2 / 3 !important;
+  }
+
+  .footer__title {
+    font-size: 0.75rem !important;
+    letter-spacing: 0.08em !important;
+    margin-bottom: 8px !important;
+  }
+
+  .footer__list {
+    gap: 7px !important;
+  }
+
+  .footer__list a {
+    font-size: 0.8125rem !important;
+    line-height: 1.35 !important;
+  }
+
+  /* Contact: Spans full width compactly at the bottom */
+  .footer__col-contact {
+    grid-column: 1 / -1 !important;
+    padding-top: 14px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+  }
+
+  .footer__contact {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    font-size: 0.8125rem !important;
+  }
+
+  .footer__contact li {
+    gap: 8px !important;
+    line-height: 1.35 !important;
+  }
+
+  .footer__contact svg {
+    width: 15px !important;
+    height: 15px !important;
+    margin-top: 1px !important;
+  }
+
+  .footer__contact address {
+    display: inline !important;
+    font-style: normal !important;
+  }
+
+  .footer__contact address br {
+    display: none !important;
+  }
+
+  /* Bottom bar: Legal links & copyright */
+  .footer__bar {
+    margin-top: 18px !important;
+    padding-top: 12px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    gap: 8px !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .footer__legal {
+    gap: 6px 14px !important;
+    justify-content: center !important;
+    font-size: 0.75rem !important;
+  }
+
+  .footer__copy {
+    font-size: 0.725rem !important;
+  }
+}

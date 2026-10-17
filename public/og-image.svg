@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Special Learns Institute — computer courses in New Delhi">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#C8F0E2" />
+      <stop offset="100%" stop-color="#A6E6D1" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <circle cx="1105" cy="110" r="220" fill="#FFFFFF" opacity="0.36" />
+  <circle cx="90" cy="585" r="150" fill="#FFC72C" opacity="0.3" />
+
+  <!-- emblem, simplified -->
+  <g transform="translate(88 205)">
+    <path d="M8 6 L96 -14 L188 34 L118 62 Z" fill="#1A1A1A" />
+    <path d="M96 -14 L188 34 L188 44 L96 -4 Z" fill="#2E2E2E" />
+    <path d="M26 30 q10 46 4 74" stroke="#C8102E" stroke-width="5" fill="none" />
+    <path d="M8 40 l-8 12 10 8 -12 10 14 6" stroke="#C8102E" stroke-width="5" fill="none" stroke-linecap="round" />
+    <path d="M150 60 A96 96 0 0 1 92 118" stroke="#1B9AAA" stroke-width="7" fill="none" stroke-linecap="round" />
+    <g stroke="#FFC72C" stroke-width="4" stroke-linecap="round">
+      <path d="M178 74 l14 -22" /><path d="M196 88 l24 -10" /><path d="M200 112 l28 4" />
+      <path d="M198 138 l26 16" /><path d="M186 158 l16 26" />
+    </g>
+    <circle cx="96" cy="128" r="11" fill="#C2185B" />
+    <path d="M96 128 q4 26 12 40 h-24 q8 -14 12 -40Z" fill="#C2185B" />
+    <circle cx="56" cy="140" r="9" fill="#3555C8" />
+    <path d="M56 140 q3 20 10 32 h-20 q7 -12 10 -32Z" fill="#3555C8" />
+    <circle cx="140" cy="142" r="10" fill="#F0A22E" />
+    <path d="M140 142 q4 22 12 34 h-24 q8 -12 12 -34Z" fill="#F0A22E" />
+    <rect x="84" y="170" width="26" height="26" rx="4" fill="#FFC72C" />
+    <path d="M-4 196 q50 -16 100 0 t100 0 v10 q-50 16 -100 0 t-100 0Z" fill="#8A1E7A" />
+    <path d="M-4 182 q50 -16 100 0 t100 0 v10 q-50 16 -100 0 t-100 0Z" fill="#1B6FC4" />
+    <path d="M-4 168 q50 -16 100 0 t100 0 v10 q-50 16 -100 0 t-100 0Z" fill="#7AB648" />
+  </g>
+
+  <g font-family="Plus Jakarta Sans, Segoe UI, Arial, sans-serif">
+    <text x="360" y="236" font-size="26" font-weight="800" fill="#23428f" letter-spacing="2.5">SPECIAL LEARNS INSTITUTE</text>
+    <text x="360" y="322" font-size="66" font-weight="800" fill="#29204F" letter-spacing="-2">Computer courses</text>
+    <text x="360" y="392" font-size="66" font-weight="800" fill="#29204F" letter-spacing="-2">in New Delhi</text>
+    <text x="360" y="446" font-size="27" font-weight="600" fill="#29204F" opacity="0.76">Uttam Nagar — Beginner to diploma level</text>
+    <rect x="360" y="480" width="300" height="7" rx="3.5" fill="#23428f" />
+  </g>
+</svg>

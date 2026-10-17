@@ -1,0 +1,190 @@
+/* ==========================================================================
+   Design tokens — Special Learns Institute
+   Brand colours are sampled from the institute's own logo artwork:
+   a deep royal blue wordmark with crimson, magenta, orange, teal and
+   gold in the emblem. The indigo/blue family carries the UI; mint, cream
+   and yellow provide the surface palette.
+   ========================================================================== */
+
+:root {
+  /* ---- Brand blue (from the logo wordmark) ----------------------------- */
+  --sl-brand-blue: #23428f;
+  --sl-brand-blue-600: #2b4fa8;
+
+  /* ---- Brand / primary ------------------------------------------------ */
+  --sl-indigo-900: #1b2360;
+  --sl-indigo-800: #23306f;
+  --sl-indigo-700: #2b45a8;
+  --sl-indigo-600: #3555c8; /* primary interactive colour */
+  --sl-indigo-500: #5270dd;
+  --sl-indigo-400: #8493ea;
+  --sl-indigo-200: #c6cffb;
+  --sl-indigo-100: #e4e8fe;
+  --sl-indigo-050: #f1f4ff;
+
+  /* ---- Royal blue (interactive accent from the reference palette) ----- */
+  --sl-blue-600: #2a52cc;
+  --sl-blue-500: #3563e8;
+  --sl-blue-400: #6d88ff;
+  --sl-blue-100: #dfe6ff;
+
+  /* ---- Mint (welcoming / primary surfaces) --------------------------- */
+  --sl-mint-500: #62cdb0;
+  --sl-mint-400: #93dfc7;
+  --sl-mint-300: #c8f0e2; /* reference primary */
+  --sl-mint-200: #dcf7ee;
+  --sl-mint-100: #eafaf5;
+
+  /* ---- Warm yellow (highlight / CTA) --------------------------------- */
+  --sl-yellow-500: #eda32a;
+  --sl-yellow-400: #ffc72c; /* matches the gold in the emblem */
+  --sl-yellow-300: #ffd972;
+  --sl-yellow-100: #fff3d4;
+
+  /* ---- Supporting brand accents (from the emblem) -------------------- */
+  --sl-crimson: #c8102e;
+  --sl-magenta: #c2185b;
+  --sl-orange: #f0a22e;
+  --sl-teal: #1b9aaa;
+  --sl-sky: #a8d3ff;
+  --sl-lilac: #b9a7f0;
+
+  /* ---- Highlight band (reference "marker swipe" treatment) ----------- */
+  --sl-hl-green: #3f7d5c;
+  --sl-hl-green-shadow: #e8c9a0;
+
+  /* ---- Cream (card surfaces) ------------------------------------------ */
+  --sl-cream-300: #fff6e3; /* reference soft cream */
+  --sl-cream-200: #fffaf0;
+  --sl-cream-100: #fffdf8;
+
+  /* ---- Deep purple (headline + footer) -------------------------------- */
+  --sl-plum-900: #101929;
+  --sl-plum-800: #29204f; /* reference deep purple */
+  --sl-plum-700: #3a2f6b;
+  --sl-plum-600: #4b3f7f;
+
+  /* ---- Supporting pastels (trust / testimonial variety) -------------- */
+  --sl-peach-200: #ffd9c2;
+  --sl-peach-300: #ffb894;
+  --sl-sky-200: #cfe6ff;
+  --sl-sky-300: #a8d3ff;
+  --sl-rose-200: #ffd6e0;
+  --sl-rose-300: #ffb3c6;
+  --sl-sage-200: #d9ecd0;
+  --sl-lilac-200: #e4dcfb;
+
+  /* ---- Neutrals ------------------------------------------------------- */
+  --sl-ink-900: #16132b;
+  --sl-ink-800: #26262c; /* logo wordmark colour */
+  --sl-ink-700: #3f3f4a;
+  --sl-ink-600: #5a5a66;
+  --sl-ink-500: #6e6e7a;
+  --sl-ink-400: #8f8f9a;
+  --sl-line: #e6e3f2;
+  --sl-line-strong: #d5d1e8;
+  --sl-white: #ffffff;
+  --sl-surface: #fbfbfd;
+  --sl-surface-alt: #f6f5fc;
+
+  /* ---- Semantic ------------------------------------------------------- */
+  --sl-bg: var(--sl-white);
+  --sl-bg-soft: var(--sl-mint-100);
+  --sl-text: var(--sl-ink-700);
+  --sl-text-strong: var(--sl-ink-900);
+  --sl-text-muted: var(--sl-ink-500);
+  --sl-heading: var(--sl-plum-800);
+  --sl-accent: var(--sl-indigo-600);
+  --sl-accent-strong: var(--sl-indigo-700);
+  --sl-cta-bg: var(--sl-yellow-400);
+  --sl-cta-bg-hover: var(--sl-yellow-300);
+  --sl-cta-ink: var(--sl-ink-900);
+
+  --sl-focus: var(--sl-blue-500);
+  --sl-danger: #c62828;
+  --sl-danger-bg: #fdecec;
+  --sl-success: #1b7f5a;
+  --sl-success-bg: #e6f6ef;
+
+  /* ---- Typography ----------------------------------------------------- */
+  --sl-font: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system,
+    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  --sl-fs-eyebrow: 0.8125rem;
+  --sl-fs-body: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem);
+  --sl-fs-sm: 0.9375rem;
+  --sl-fs-lead: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+  --sl-h5: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
+  --sl-h4: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --sl-h3: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+  --sl-h2: clamp(1.875rem, 1.5rem + 1.8vw, 2.875rem);
+  --sl-h1: clamp(2.25rem, 1.7rem + 3vw, 4rem);
+
+  --sl-lh-tight: 1.12;
+  --sl-lh-snug: 1.25;
+  --sl-lh-body: 1.7;
+
+  /* ---- Space scale ---------------------------------------------------- */
+  --sl-1: 0.25rem;
+  --sl-2: 0.5rem;
+  --sl-3: 0.75rem;
+  --sl-4: 1rem;
+  --sl-5: 1.5rem;
+  --sl-6: 2rem;
+  --sl-7: 2.5rem;
+  --sl-8: 3rem;
+  --sl-9: 4rem;
+  --sl-10: 5rem;
+  --sl-11: 6.5rem;
+
+  --sl-section-y: clamp(3.5rem, 2rem + 6vw, 7rem);
+  --sl-gutter: clamp(1.125rem, 0.6rem + 2.4vw, 2.5rem);
+  --sl-maxw: 1200px;
+  --sl-maxw-prose: 68ch;
+  --sl-maxw-wide: 1360px;
+
+  /*
+     Reading measure. `ch` proved unreliable here — Plus Jakarta Sans has a
+     wide "0" glyph, so 54ch resolved to ~950px and produced 150-character
+     lines on wide screens. These are tuned so prose lands near 60-70
+     characters per line at each font size:
+       640px at 20px  -> ~64 chars
+       600px at 16px  -> ~68 chars
+       560px at 15px  -> ~68 chars
+  */
+  --sl-measure-xl: 640px;
+  --sl-measure: 600px;
+  --sl-measure-sm: 560px;
+
+  /* ---- Radii ---------------------------------------------------------- */
+  --sl-r-xs: 8px;
+  --sl-r-sm: 12px;
+  --sl-r-md: 18px;
+  --sl-r-lg: 26px;
+  --sl-r-xl: 34px;
+  --sl-r-2xl: 44px;
+  --sl-r-pill: 999px;
+
+  /* ---- Elevation (soft + restrained) ---------------------------------- */
+  --sl-sh-xs: 0 1px 2px rgba(29, 23, 57, 0.05);
+  --sl-sh-sm: 0 2px 8px rgba(29, 23, 57, 0.06);
+  --sl-sh-md: 0 10px 26px -12px rgba(29, 23, 57, 0.16);
+  --sl-sh-lg: 0 22px 48px -22px rgba(29, 23, 57, 0.26);
+  --sl-sh-xl: 0 38px 80px -36px rgba(29, 23, 57, 0.34);
+  /* Offset shadow used on primary CTAs (see reference language) */
+  --sl-sh-cta: 0 5px 0 var(--sl-indigo-600);
+  --sl-sh-cta-sm: 0 4px 0 var(--sl-indigo-600);
+
+  /* ---- Motion --------------------------------------------------------- */
+  --sl-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --sl-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --sl-dur-fast: 140ms;
+  --sl-dur: 240ms;
+  --sl-dur-slow: 520ms;
+
+  /* ---- Layout --------------------------------------------------------- */
+  --sl-nav-h: 76px;
+  --sl-z-nav: 60;
+  --sl-z-menu: 70;
+  --sl-z-skip: 100;
+}

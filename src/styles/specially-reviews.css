@@ -1,0 +1,779 @@
+/* ==========================================================================
+   Specially Reviews & Features Section — Responsive & Stamped
+   - Pastel seafoam/mint background (#CEEAE4)
+   - Bold chunky headline with radiant lightbulb doodle
+   - Blue loop doodle in top-right
+   - 3D Blue pill button with terracotta block shadow
+   - Layered paper cards that sit stamped over an underlying textured sheet
+   - Authentic weathered rubber ink stamps stamped over each card with wavy postmarks
+   - Official circular institute seal stamped over the header
+   - Desktop: 3-column paginated grid
+   - Mobile: Single-row horizontal swipe track (vertically short & horizontally long)
+   ========================================================================== */
+
+.specially-reviews-section {
+  position: relative;
+  background-color: #CEEAE4 !important;
+  padding: clamp(52px, 6.5vw, 88px) 0 clamp(64px, 8vw, 104px) !important;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Playful blue cursive loop curl in top-right corner */
+.specially-curl-doodle {
+  position: absolute;
+  top: 30px;
+  right: clamp(24px, 4vw, 64px);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.9;
+  animation: doodleFloat 6s ease-in-out infinite alternate;
+}
+
+@keyframes doodleFloat {
+  0% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(-6px) rotate(3deg); }
+}
+
+/* Header row: Left Title + Official Seal + Right Description & Button */
+.specially-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 40px;
+  margin-bottom: 48px;
+  position: relative;
+  z-index: 2;
+}
+
+.specially-title-block {
+  flex: 1 1 52%;
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.specially-title {
+  margin: 0;
+  font-family: var(--sl-font, 'Plus Jakarta Sans', sans-serif);
+  font-weight: 850;
+  font-size: clamp(2.3rem, 4.4vw, 3.8rem);
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+  color: #0f172a;
+}
+
+.specially-title__row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.specially-title__line {
+  display: block;
+}
+
+/* Lightbulb with glowing radiant rays */
+.specially-lightbulb-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transform: translateY(-2px);
+}
+
+.specially-lightbulb-svg {
+  width: clamp(40px, 4.5vw, 54px);
+  height: clamp(48px, 5.2vw, 62px);
+  overflow: visible;
+  filter: drop-shadow(0 2px 8px rgba(253, 224, 71, 0.45));
+}
+
+/* Official Header Circular Stamp ("Stamped over the section") */
+.specially-header-stamp {
+  flex-shrink: 0;
+  transform: rotate(-9deg) translateY(-8px);
+  user-select: none;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  opacity: 0.88;
+  filter: drop-shadow(0 2px 4px rgba(185, 28, 28, 0.15));
+  animation: stampPulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes stampPulse {
+  0% { transform: rotate(-9deg) translateY(-8px) scale(1); }
+  100% { transform: rotate(-11deg) translateY(-10px) scale(1.02); }
+}
+
+/* Right side action block */
+.specially-action-block {
+  flex: 1 1 42%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.specially-intro {
+  margin: 0;
+  font-size: clamp(0.875rem, 0.84rem + 0.2vw, 0.975rem);
+  line-height: 1.65;
+  color: #334155;
+}
+
+.specially-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+/* Distinctive 3D Blue Pill Button */
+.specially-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #3577f6;
+  color: #ffffff !important;
+  font-size: 0.925rem;
+  font-weight: 700;
+  padding: 13px 30px;
+  border-radius: 9999px;
+  text-decoration: none !important;
+  box-shadow: 0 6px 0 0 #b34a1b;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  user-select: none;
+}
+
+.specially-pill-btn:hover {
+  transform: translateY(2px);
+  box-shadow: 0 4px 0 0 #b34a1b;
+}
+
+.specially-pill-btn:active {
+  transform: translateY(6px);
+  box-shadow: 0 0 0 0 #b34a1b;
+}
+
+/* Switcher / View modes */
+.specially-view-toggles {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(8px);
+  padding: 4px;
+  border-radius: 9999px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  gap: 3px;
+}
+
+.specially-toggle-chip {
+  background: transparent;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.775rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.specially-toggle-chip.is-active {
+  background: #0f172a;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
+}
+
+/* ==========================================================================
+   Desktop Cards Grid (3 Columns)
+   ========================================================================== */
+
+.specially-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  position: relative;
+  z-index: 2;
+}
+
+/* On Desktop: Hide items not belonging to active page */
+@media (min-width: 769px) {
+  .specially-card-wrapper--hide-desktop {
+    display: none !important;
+  }
+
+  .specially-dots--mobile {
+    display: none !important;
+  }
+}
+
+/* The Wrapper that hosts the Underlay Sheet + The Stamped Card */
+.specially-card-wrapper {
+  position: relative;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.specially-card-wrapper:hover {
+  transform: translateY(-6px);
+}
+
+/* 1. The Underlay Surface: The Sheet that the Card is "Stamped Over" */
+.specially-card-underlay {
+  position: absolute;
+  inset: -6px -6px -10px -6px;
+  background: #FAF3E6;
+  border-radius: 26px;
+  border: 1.5px dashed rgba(30, 41, 59, 0.22);
+  z-index: 1;
+  pointer-events: none;
+  box-shadow: 0 10px 24px -8px rgba(15, 23, 42, 0.08);
+  transition: transform 0.3s ease;
+}
+
+.specially-card-wrapper:nth-child(3n + 1) .specially-card-underlay {
+  transform: rotate(-2deg);
+  background: #FAF1E1;
+}
+
+.specially-card-wrapper:nth-child(3n + 2) .specially-card-underlay {
+  transform: rotate(1.8deg);
+  background: #F8F4EA;
+}
+
+.specially-card-wrapper:nth-child(3n) .specially-card-underlay {
+  transform: rotate(-1.4deg);
+  background: #FAF0E4;
+}
+
+.specially-card-underlay::after {
+  content: 'SPECIAL LEARNS';
+  position: absolute;
+  bottom: 8px;
+  left: 20px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: rgba(30, 41, 59, 0.25);
+  text-transform: uppercase;
+}
+
+/* 2. Main Card: Sits proudly stamped down on top of the underlay */
+.specially-card {
+  position: relative;
+  z-index: 2;
+  background: #FFF8EC;
+  border-radius: 22px;
+  padding: 38px 30px 32px;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 6px 18px -4px rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(225, 208, 175, 0.55);
+  overflow: hidden;
+  transition: box-shadow 0.25s ease;
+}
+
+.specially-card-wrapper:hover .specially-card {
+  box-shadow: 0 18px 36px -8px rgba(15, 23, 42, 0.12);
+}
+
+/* Golden Corner Arcs (top-right of card) */
+.specially-card__arcs {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 48px;
+  height: 48px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ==========================================================================
+   3. The Rubber Ink Stamp: Stamped Diagonally Over the Card
+   ========================================================================== */
+
+.specially-card-stamp {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transform: rotate(-11deg);
+  transform-origin: center right;
+  mix-blend-mode: multiply;
+  opacity: 0.9;
+  user-select: none;
+  pointer-events: none;
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.specially-card-wrapper:hover .specially-card-stamp {
+  transform: rotate(-14deg) scale(1.06);
+}
+
+.specially-stamp-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 12px 4px;
+  border: 2px solid var(--stamp-color, #b91c1c);
+  border-radius: 6px;
+  color: var(--stamp-color, #b91c1c);
+  background: rgba(255, 255, 255, 0.2);
+  outline: 1px dashed var(--stamp-color, #b91c1c);
+  outline-offset: -3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.specially-stamp-stars {
+  font-size: 7px;
+  letter-spacing: 2px;
+  line-height: 1;
+  font-weight: 900;
+  margin-bottom: 2px;
+}
+
+.specially-stamp-main {
+  font-family: 'Courier New', Courier, monospace, var(--sl-font);
+  font-size: 9.5px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  line-height: 1.1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.specially-stamp-sub {
+  font-family: 'Courier New', Courier, monospace, var(--sl-font);
+  font-size: 6.5px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  line-height: 1;
+  text-transform: uppercase;
+  margin-top: 2px;
+  opacity: 0.9;
+}
+
+.specially-stamp-waves {
+  width: 44px;
+  height: 22px;
+  color: var(--stamp-color, #b91c1c);
+  opacity: 0.75;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Card Content
+   ========================================================================== */
+
+.specially-card__icon-wrap {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 22px;
+  position: relative;
+  z-index: 2;
+}
+
+.specially-card__icon {
+  width: 44px;
+  height: 44px;
+  color: #111827;
+}
+
+.specially-card__title {
+  margin: 0 0 14px;
+  font-family: var(--sl-font, 'Plus Jakarta Sans', sans-serif);
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: #111827;
+  position: relative;
+  z-index: 2;
+}
+
+.specially-card__text {
+  margin: 0 0 20px;
+  font-size: 0.885rem;
+  line-height: 1.65;
+  color: #4b5563;
+  flex-grow: 1;
+  position: relative;
+  z-index: 2;
+}
+
+.specially-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 1px dashed rgba(214, 196, 161, 0.6);
+  margin-top: auto;
+  gap: 12px;
+  position: relative;
+  z-index: 2;
+}
+
+.specially-card__author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.specially-card__avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #E8F3EE;
+  color: #2D5844;
+  font-weight: 800;
+  font-size: 0.85rem;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(45, 88, 68, 0.15);
+}
+
+.specially-card__meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.specially-card__name {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.specially-card__role {
+  font-size: 0.725rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.specially-card__stars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: #F59E0B;
+  flex-shrink: 0;
+}
+
+/* Pagination Bar */
+.specially-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 36px;
+  position: relative;
+  z-index: 2;
+}
+
+.specially-nav-btn {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.specially-nav-btn:hover:not(:disabled) {
+  background: #0f172a;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.specially-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.specially-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.specially-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.2);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.specially-dot.is-active {
+  width: 26px;
+  border-radius: 10px;
+  background: #0f172a;
+}
+
+/* Mobile swipe hint */
+.specially-mobile-swipe-hint {
+  display: none;
+}
+
+/* ==========================================================================
+   Mobile Optimizations (Vertically Short & Horizontally Long Cards in 1 Row)
+   ========================================================================== */
+
+@media (max-width: 860px) {
+  .specially-reviews-section {
+    padding: 38px 0 46px !important;
+  }
+
+  .specially-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .specially-title-block {
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .specially-title {
+    font-size: 2.15rem;
+  }
+
+  .specially-header-stamp {
+    transform: rotate(-8deg) scale(0.85);
+    margin-top: -6px;
+  }
+
+  .specially-action-block {
+    max-width: 100%;
+    gap: 16px;
+  }
+
+  .specially-intro {
+    font-size: 0.85rem;
+  }
+
+  .specially-cta-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .specially-pill-btn {
+    width: 100%;
+  }
+
+  .specially-view-toggles {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .specially-curl-doodle {
+    top: 14px;
+    right: 14px;
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Single-row horizontal swipe container */
+  .specially-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+    gap: 16px !important;
+    margin-inline: -16px !important;
+    padding-inline: 16px !important;
+    padding-block: 10px 14px !important;
+    scrollbar-width: none !important;
+  }
+
+  .specially-grid::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* Each Card: Horizontally Long & Snapped in the Same Row */
+  .specially-card-wrapper {
+    flex: 0 0 85vw !important;
+    max-width: 380px !important;
+    min-width: 275px !important;
+    scroll-snap-align: center !important;
+    scroll-snap-stop: normal !important;
+  }
+
+  .specially-card-wrapper--hide-desktop {
+    display: block !important;
+  }
+
+  .specially-card-underlay {
+    inset: -4px -4px -6px -4px;
+    border-radius: 18px;
+  }
+
+  /* Card is Vertically Short with compact vertical footprint */
+  .specially-card {
+    border-radius: 18px !important;
+    padding: 16px 18px 14px !important;
+    min-height: 0 !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+  }
+
+  .specially-card__arcs {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  /* Compact top icon */
+  .specially-card__icon-wrap {
+    width: 32px !important;
+    height: 32px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .specially-card__icon {
+    width: 26px !important;
+    height: 26px !important;
+  }
+
+  /* Scaled and tucked in stamp */
+  .specially-card-stamp {
+    top: 8px !important;
+    right: 8px !important;
+    transform: rotate(-8deg) scale(0.78) !important;
+    transform-origin: top right !important;
+  }
+
+  .specially-card-stamp .specially-stamp-badge {
+    padding: 3px 8px 3px;
+  }
+
+  .specially-card-stamp .specially-stamp-main {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+
+  .specially-card-stamp .specially-stamp-sub {
+    font-size: 5.5px;
+  }
+
+  .specially-card-stamp .specially-stamp-waves {
+    width: 30px;
+    height: 16px;
+  }
+
+  /* Card Title: compact 2-line clamp */
+  .specially-card__title {
+    font-size: 0.95rem !important;
+    line-height: 1.28 !important;
+    margin: 0 0 5px !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+
+  /* Card Text: compact 2-3 line clamp */
+  .specially-card__text {
+    font-size: 0.8rem !important;
+    line-height: 1.42 !important;
+    margin: 0 0 8px !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+
+  /* Student Footer: Tidy, compact single row */
+  .specially-card__foot {
+    padding-top: 8px !important;
+    margin-top: 4px !important;
+    gap: 8px !important;
+  }
+
+  .specially-card__avatar {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 0.725rem !important;
+  }
+
+  .specially-card__name {
+    font-size: 0.775rem !important;
+  }
+
+  .specially-card__role {
+    font-size: 0.65rem !important;
+  }
+
+  .specially-card__stars svg {
+    width: 11px !important;
+    height: 11px !important;
+  }
+
+  /* Mobile swipe hint display */
+  .specially-mobile-swipe-hint {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    font-size: 0.725rem !important;
+    color: #475569 !important;
+    margin-top: 8px !important;
+    font-weight: 600 !important;
+    opacity: 0.85;
+  }
+
+  /* Hide desktop pagination dots and show mobile swipe dots */
+  .specially-dots--desktop {
+    display: none !important;
+  }
+
+  .specially-dots--mobile {
+    display: flex !important;
+  }
+
+  .specially-pagination {
+    margin-top: 14px !important;
+  }
+
+  .specially-nav-btn {
+    width: 36px !important;
+    height: 36px !important;
+  }
+}
