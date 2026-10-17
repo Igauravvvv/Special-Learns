@@ -576,8 +576,207 @@
   overflow-wrap: anywhere;
 }
 
-.site-card__by {
+.site-card__author {
+  font-size: 0.78rem;
   color: var(--sl-text-muted);
+}
+
+.site-card__author strong {
+  color: var(--sl-heading);
+  font-weight: 600;
+}
+
+/* Badge overlay on screenshot */
+.site-card__badge-live {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #f8fafc;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+.site-card__live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35);
+}
+
+.site-card__shot-cta {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: var(--sl-indigo-600, #4747d7);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(71, 71, 215, 0.35);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity var(--sl-dur) var(--sl-ease), transform var(--sl-dur) var(--sl-ease);
+  z-index: 2;
+}
+
+.site-card:hover .site-card__shot-cta {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.site-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.site-card__alumni-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(71, 71, 215, 0.09);
+  color: var(--sl-indigo-700);
+  border: 1px solid rgba(71, 71, 215, 0.22);
+}
+
+.site-card__feature-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.site-card__feature-chip {
+  font-size: 0.72rem;
+  color: var(--sl-text-muted);
+  background: var(--sl-surface-alt, #f8fafc);
+  border: 1px solid var(--sl-line);
+  padding: 2px 7px;
+  border-radius: 5px;
+}
+
+.site-card__button-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--sl-2);
+  padding: 8px 14px;
+  background: #f1f5f9;
+  color: var(--sl-indigo-700);
+  border-radius: var(--sl-r-md, 8px);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  transition: background var(--sl-dur) var(--sl-ease), color var(--sl-dur) var(--sl-ease);
+}
+
+.site-card:hover .site-card__button-cta {
+  background: var(--sl-indigo-600, #4747d7);
+  color: #ffffff;
+}
+
+/* Spotlight banner for featured alumnus Gaurav Bhatt */
+.showcase__spotlight-banner {
+  display: grid;
+  gap: 1.25rem;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(238, 242, 255, 0.95) 100%);
+  border: 1.5px solid rgba(71, 71, 215, 0.22);
+  border-radius: var(--sl-r-xl, 16px);
+  padding: clamp(1.2rem, 1rem + 1vw, 1.75rem);
+  box-shadow: 0 4px 20px rgba(71, 71, 215, 0.06);
+  margin-top: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .showcase__spotlight-banner {
+    grid-template-columns: auto 1fr auto;
+  }
+}
+
+.showcase__spotlight-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--sl-indigo-600, #4747d7);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.showcase__spotlight-name {
+  font-size: clamp(1.15rem, 1.05rem + 0.4vw, 1.35rem);
+  font-weight: 800;
+  color: var(--sl-heading);
+  margin: 0 0 0.25rem;
+}
+
+.showcase__spotlight-desc {
+  font-size: var(--sl-fs-sm);
+  color: var(--sl-text);
+  line-height: 1.55;
+  margin: 0;
+  max-width: 65ch;
+}
+
+.showcase__spotlight-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+@media (min-width: 768px) {
+  .showcase__spotlight-meta {
+    align-items: flex-end;
+  }
+}
+
+.showcase__spotlight-count {
+  font-size: 0.85rem;
+  color: var(--sl-indigo-700);
+  background: rgba(71, 71, 215, 0.1);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.showcase__spotlight-count strong {
+  font-weight: 800;
+  margin-right: 3px;
+}
+
+.showcase__spotlight-inst {
+  font-size: 0.72rem;
+  color: var(--sl-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /* ---------- Torn-paper testimonial tweaks --------------------------------- */

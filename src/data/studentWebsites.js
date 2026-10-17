@@ -3,36 +3,55 @@
  *
  * HOW TO ADD A STUDENT WEBSITE
  * ----------------------------
- * Add one object to `studentWebsites` below. Nothing else needs changing —
- * the section, the grid and the empty state all read from this file.
+ * Add one object to `studentWebsites` below.
  *
  *   {
- *     title: 'My Recipes Blog',
- *     url: 'https://example.com',        // must include https://
- *     student: 'Aarav Sharma',           // optional, omit if you'd rather not name them
- *     course: 'Web Design & Development', // must match a course title in programs.js
- *     blurb: 'A responsive recipe site built with HTML, CSS and JavaScript.',
- *     screenshot: '/showcase/recipes.jpg', // optional — falls back to a generated tile
+ *     title: 'Site Title',
+ *     url: 'https://example.com',
+ *     student: 'Student Name',
+ *     course: 'Web Design & Development',
+ *     blurb: 'Description of the site and tech stack.',
+ *     screenshot: '/showcase/image.png',
  *   }
- *
- * Notes
- * -----
- * - `screenshot` is optional. Without it the card shows a generated tile with
- *   the site's initial, so you can publish entries immediately.
- * - Put screenshots in `public/showcase/` and use a path starting `/showcase/`.
- * - No entries are listed yet, because none have been supplied. The section
- *   renders an honest empty state until you add the first one.
  */
 
 export const studentWebsites = [
-  // {
-  //   title: 'My Recipes Blog',
-  //   url: 'https://example.com',
-  //   student: 'Aarav Sharma',
-  //   course: 'Web Design & Development',
-  //   blurb: 'A responsive recipe site built with HTML, CSS and JavaScript.',
-  //   screenshot: '/showcase/recipes.jpg',
-  // },
+  {
+    title: "Slug's Era",
+    url: 'https://www.slugsera.com',
+    student: 'Gaurav Bhatt',
+    alumni: true,
+    course: 'Web Design & Development',
+    category: 'Streetwear & E-Commerce',
+    blurb:
+      'Independent streetwear & oversized apparel fashion brand storefront featuring custom lookbooks, responsive mobile shopping and cart checkout flow.',
+    screenshot: '/showcase/slugsera.png',
+    tags: ['E-Commerce', 'Fashion Brand', 'Responsive UI'],
+  },
+  {
+    title: 'Rupali Construction & Homes',
+    url: 'https://rupaliconstruction.com',
+    student: 'Gaurav Bhatt',
+    alumni: true,
+    course: 'Web Design & Development',
+    category: 'Real Estate & Architecture',
+    blurb:
+      'Full-service real estate and construction portal featuring property discovery, project catalogues, interactive filtering and mobile-first architecture.',
+    screenshot: '/showcase/rupali-construction.png',
+    tags: ['Corporate Portal', 'Property Showcase', 'Architecture'],
+  },
+  {
+    title: 'AAW Aesthetic Wear',
+    url: 'https://awaestheticwear.com',
+    student: 'Gaurav Bhatt',
+    alumni: true,
+    course: 'Web Design & Development',
+    category: 'Luxury Fashion & Apparel',
+    blurb:
+      'Contemporary fashion & luxury streetwear brand website with sleek dark styling, seasonal collections, dynamic product galleries and direct shopping.',
+    screenshot: '/showcase/aesthetic-wear.png',
+    tags: ['Streetwear', 'Dark Mode UI', 'Online Store'],
+  },
 ];
 
 /** Group entries by the course they came from, for filter chips. */

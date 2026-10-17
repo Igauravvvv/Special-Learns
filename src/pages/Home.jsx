@@ -10,6 +10,7 @@ import Icon from '../components/Icon.jsx';
 import Reveal from '../components/Reveal.jsx';
 import Gallery from '../components/Gallery.jsx';
 import Reviews from '../components/Reviews.jsx';
+import StudentWebsites from '../components/StudentWebsites.jsx';
 import LearningScene from '../components/illustrations/LearningScene.jsx';
 import { contact, facts } from '../data/site.js';
 import { categories, countByCategory } from '../data/programs.js';
@@ -126,6 +127,7 @@ export default function Home() {
     <section className="section home-work" aria-labelledby="work-heading">
       <div className="container"><div className="home-section-heading"><div><p className="eyebrow eyebrow--plain">Made by our learners</p><h2 id="work-heading">A little practice. Real work.</h2></div><Link className="link-arrow" to="/student-work">More student work<ArrowRight size={16} aria-hidden="true" /></Link></div><p className="home-work__intro">Posters, layouts and digital artwork created by learners during their courses. Tap a project for a closer look.</p><Gallery items={studentWork.slice(0, 4)} /></div>
     </section>
+    <StudentWebsites limit={3} />
     <section className="section home-start" aria-labelledby="start-heading">
       <div className="container"><div className="home-section-heading"><div><p className="eyebrow eyebrow--plain">Getting started</p><h2 id="start-heading">From curious to your first class.</h2></div></div>
         <ol className="home-start__steps">{firstSteps.map((step, index) => <li key={step.title}><span aria-hidden="true">0{index + 1}</span><div><h3>{step.title}</h3><p>{step.text}</p></div></li>)}</ol>

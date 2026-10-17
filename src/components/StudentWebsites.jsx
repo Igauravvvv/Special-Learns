@@ -1,4 +1,4 @@
-import { ArrowUpRight, Globe, Plus } from 'lucide-react';
+import { ArrowUpRight, Globe, Plus, Sparkles, ExternalLink, Award } from 'lucide-react';
 
 import Button from './Button.jsx';
 import Reveal from './Reveal.jsx';
@@ -14,13 +14,13 @@ import {
 } from '../data/studentWebsites.js';
 
 /**
- * Showcase of websites built by students.
+ * Showcase of live websites built by students & alumni.
  *
- * Entirely data-driven from src/data/studentWebsites.js — adding an entry
- * there is the only step needed to publish a project. Renders an honest empty
- * state until entries exist, rather than inventing any.
+ * Highlights real client and brand storefronts created by institute alumni
+ * like Gaurav Bhatt, linking directly to each live website so visitors can
+ * explore the artwork, layouts, and responsive development.
  */
-export default function StudentWebsites({ limit }) {
+export default function StudentWebsites({ limit, showSpotlight = true }) {
   const all = studentWebsites
     .map((site) => ({ ...site, href: safeUrl(site.url) }))
     .filter((site) => site.href);
@@ -29,23 +29,24 @@ export default function StudentWebsites({ limit }) {
   const hasEntries = items.length > 0;
 
   return (
-    <section className="section section--mint-soft" aria-labelledby="showcase-heading">
+    <section className="section section--mint-soft student-showcase-section" aria-labelledby="showcase-heading">
       <div className="container">
         <div className="showcase__head">
           <div>
             <p className="eyebrow" style={{ marginBottom: '1.15rem' }}>
               <span className="eyebrow__dot" aria-hidden="true" />
-              Built by our learners
+              Alumni Spotlight & Live Websites
             </p>
             <h2 id="showcase-heading" className="showcase__title">
-              Websites our students <Highlight tone="green">have built</Highlight>
+              Websites our students & alumni <Highlight tone="green">have built</Highlight>
             </h2>
           </div>
 
           <div className="showcase__intro">
             <p>
-              Every project below was designed and coded in our lab as part of a web
-              development or programming course. They open in a new tab.
+              Explore real-world production websites designed and developed by our learners and alumni,
+              including featured alumnus <strong>Gaurav Bhatt</strong>. Tap any project to visit the live site
+              and see the artwork, branding, and full interactive design.
             </p>
             <Button to="/contact" variant="ghost" size="sm">
               Want to build one too?
@@ -54,10 +55,34 @@ export default function StudentWebsites({ limit }) {
           </div>
         </div>
 
+        {showSpotlight && (
+          <Reveal variant="fade" delay={40}>
+            <div className="showcase__spotlight-banner">
+              <div className="showcase__spotlight-badge">
+                <Award size={18} aria-hidden="true" />
+                <span>Featured Alumni Profile</span>
+              </div>
+              <div className="showcase__spotlight-content">
+                <h3 className="showcase__spotlight-name">Gaurav Bhatt</h3>
+                <p className="showcase__spotlight-desc">
+                  Alumnus of Special Learns Institute (Web Design & Development). Gaurav has designed and deployed
+                  commercial e-commerce stores, real-estate corporate portals, and lifestyle apparel brand websites.
+                </p>
+              </div>
+              <div className="showcase__spotlight-meta">
+                <span className="showcase__spotlight-count">
+                  <strong>3</strong> Live Websites
+                </span>
+                <span className="showcase__spotlight-inst">Trained in Lab</span>
+              </div>
+            </div>
+          </Reveal>
+        )}
+
         {hasEntries ? (
-          <ul className="showcase__grid">
+          <ul className="showcase__grid" style={{ marginTop: '2rem' }}>
             {items.map((site, index) => (
-              <Reveal as="li" key={site.href} delay={index * 70} variant="scale">
+              <Reveal as="li" key={site.href} delay={index * 80} variant="scale">
                 <SiteCard site={site} />
               </Reveal>
             ))}
@@ -69,7 +94,7 @@ export default function StudentWebsites({ limit }) {
         {hasEntries && all.length > items.length ? (
           <p className="center" style={{ marginTop: '2.5rem' }}>
             <Button to="/student-work" variant="indigo">
-              See all {all.length} projects
+              See all student work & websites
               <ArrowUpRight size={16} aria-hidden="true" />
             </Button>
           </p>
@@ -102,23 +127,27 @@ function SiteCard({ site }) {
         href={site.href}
         target="_blank"
         rel="noopener noreferrer"
+        aria-label={`Open ${site.title} live website at ${host || site.url} (opens in a new tab)`}
       >
-        <span className="sr-only">
-          Open {site.title}
-          {host ? `, ${host}` : ''} (opens in a new tab)
-        </span>
-
         {/* Thumbnail: real screenshot when supplied, otherwise a generated tile. */}
         {site.screenshot ? (
           <span className="site-card__shot">
             <img
               src={site.screenshot}
-              alt={`Screenshot of ${site.title}`}
+              alt={`Live website screenshot of ${site.title}`}
               width="600"
               height="375"
               loading="lazy"
               decoding="async"
             />
+            <span className="site-card__badge-live">
+              <span className="site-card__live-dot" aria-hidden="true" />
+              Live Site
+            </span>
+            <span className="site-card__shot-cta" aria-hidden="true">
+              <span>Visit live site</span>
+              <ArrowUpRight size={14} />
+            </span>
           </span>
         ) : (
           <span className="site-card__shot site-card__shot--placeholder" aria-hidden="true">
@@ -127,22 +156,42 @@ function SiteCard({ site }) {
         )}
 
         <span className="site-card__body">
-          {site.course ? <span className="pill">{site.course}</span> : null}
+          <div className="site-card__tags">
+            {site.category ? <span className="pill pill--sm">{site.category}</span> : null}
+            {site.alumni ? <span className="site-card__alumni-pill">Alumnus Work</span> : null}
+          </div>
 
           <span className="site-card__title">
-            {site.title}
-            <ArrowUpRight size={18} aria-hidden="true" />
+            <span>{site.title}</span>
+            <ArrowUpRight size={18} aria-hidden="true" className="site-card__title-arrow" />
           </span>
 
           {site.blurb ? <span className="site-card__blurb">{site.blurb}</span> : null}
+
+          {site.tags && site.tags.length > 0 ? (
+            <div className="site-card__feature-chips" aria-hidden="true">
+              {site.tags.map((tag) => (
+                <span key={tag} className="site-card__feature-chip">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          ) : null}
 
           <span className="site-card__foot">
             <span className="site-card__host">
               <Globe size={13} aria-hidden="true" />
               {host || site.url}
             </span>
-            {site.student ? <span className="site-card__by">by {site.student}</span> : null}
+            <span className="site-card__author">
+              by <strong>{site.student}</strong>
+            </span>
           </span>
+
+          <div className="site-card__button-cta" aria-hidden="true">
+            <span>Open {host || 'Website'}</span>
+            <ExternalLink size={14} />
+          </div>
         </span>
       </a>
     </article>
