@@ -105,6 +105,12 @@ export default function Footer() {
             <li>
               <a href={`${SITE_URL}/sitemap.xml`}>Sitemap</a>
             </li>
+            <li>
+              <Link to="/attendance">Student Check-in</Link>
+            </li>
+            <li>
+              <Link to="/admin">Admin Login</Link>
+            </li>
           </ul>
           <p className="footer__copy">
             &copy; {year} {brand.name}. All rights reserved.

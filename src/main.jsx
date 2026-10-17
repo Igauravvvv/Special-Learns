@@ -16,6 +16,7 @@ import './styles/scenes.css';
 import './styles/hero.css';
 import './styles/home.css';
 import './styles/specially-reviews.css';
+import './styles/admin.css';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {

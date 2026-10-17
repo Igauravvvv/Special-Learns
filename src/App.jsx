@@ -14,6 +14,8 @@ import Faq from './pages/Faq.jsx';
 import Contact from './pages/Contact.jsx';
 import PrivacyPolicy from './pages/PrivacyPolicy.jsx';
 import Terms from './pages/Terms.jsx';
+import Admin from './pages/Admin.jsx';
+import StudentCheckIn from './pages/StudentCheckIn.jsx';
 import NotFound from './pages/NotFound.jsx';
 
 export default function App() {
@@ -36,6 +38,9 @@ export default function App() {
           <Route path="/student-work" element={<StudentWork />} />
           <Route path="/faq" element={<Faq />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/attendance" element={<StudentCheckIn />} />
+          <Route path="/student-checkin" element={<StudentCheckIn />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="*" element={<NotFound />} />

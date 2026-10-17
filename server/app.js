@@ -3,9 +3,22 @@ import compression from 'compression';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
 
-import { saveEnquiry } from './store.js';
-import { deliverEnquiry } from './mailer.js';
+import { saveEnquiry, readEnquiries } from './store.js';
+import { deliverEnquiry, deliverFeeAlertEmail } from './mailer.js';
 import { MAX_BODY_BYTES, validateEnquiry } from './validation.js';
+import {
+  getAllStudents,
+  createStudent,
+  updateStudent,
+  deleteStudent,
+  getAllFees,
+  recordFeePayment,
+  getFeeAlerts,
+  getAttendance,
+  saveAttendanceBatch,
+  studentSelfCheckIn,
+  getDashboardOverview,
+} from './studentStore.js';
 
 const app = express();
 
@@ -24,6 +37,273 @@ app.use((req, res, next) => {
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   next();
+});
+
+/* -------------------------------------------------------------------------- */
+/* Admin Authentication Middleware                                            */
+/* -------------------------------------------------------------------------- */
+
+const ADMIN_USER = process.env.ADMIN_USER || 'admin';
+const ADMIN_PASS = process.env.ADMIN_PASSWORD || 'admin123';
+const VALID_TOKEN_PREFIX = 'sl-admin-session-';
+
+function requireAdmin(req, res, next) {
+  const authHeader = req.headers.authorization || '';
+  const token = authHeader.startsWith('Bearer ')
+    ? authHeader.slice(7).trim()
+    : (req.headers['x-admin-token'] || '').trim();
+
+  if (!token || !token.startsWith(VALID_TOKEN_PREFIX)) {
+    return res.status(401).json({ ok: false, message: 'Unauthorized. Please log in as admin.' });
+  }
+  next();
+}
+
+/* -------------------------------------------------------------------------- */
+/* Admin Auth Endpoints                                                       */
+/* -------------------------------------------------------------------------- */
+
+app.post('/api/admin/login', (req, res) => {
+  const { username, password } = req.body || {};
+
+  if (username === ADMIN_USER && password === ADMIN_PASS) {
+    const token = `${VALID_TOKEN_PREFIX}${Date.now()}-${randomUUID().slice(0, 8)}`;
+    return res.json({
+      ok: true,
+      token,
+      user: {
+        username: ADMIN_USER,
+        name: 'Administrator',
+        role: 'superadmin',
+      },
+    });
+  }
+
+  return res.status(401).json({
+    ok: false,
+    message: 'Invalid credentials. User ID is "admin" and password is "admin123".',
+  });
+});
+
+app.get('/api/admin/verify', requireAdmin, (req, res) => {
+  res.json({ ok: true, user: { username: ADMIN_USER, role: 'superadmin' } });
+});
+
+/* -------------------------------------------------------------------------- */
+/* Admin Dashboard Overview                                                   */
+/* -------------------------------------------------------------------------- */
+
+app.get('/api/admin/overview', requireAdmin, async (req, res) => {
+  try {
+    const overview = await getDashboardOverview();
+    res.json({ ok: true, data: overview });
+  } catch (err) {
+    console.error('[admin] overview error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to load dashboard metrics.' });
+  }
+});
+
+/* -------------------------------------------------------------------------- */
+/* Student Admissions (Enrollment) Endpoints                                  */
+/* -------------------------------------------------------------------------- */
+
+app.get('/api/admin/students', requireAdmin, async (req, res) => {
+  try {
+    let students = await getAllStudents();
+    const { q, course, status } = req.query;
+
+    if (q) {
+      const query = q.toLowerCase();
+      students = students.filter(
+        (s) =>
+          s.name.toLowerCase().includes(query) ||
+          s.rollNo.toLowerCase().includes(query) ||
+          (s.phone && s.phone.includes(query)) ||
+          (s.course && s.course.toLowerCase().includes(query)),
+      );
+    }
+    if (course && course !== 'all') {
+      students = students.filter((s) => s.course === course);
+    }
+    if (status && status !== 'all') {
+      students = students.filter((s) => s.status === status);
+    }
+
+    res.json({ ok: true, count: students.length, data: students });
+  } catch (err) {
+    console.error('[admin] get students error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to fetch students.' });
+  }
+});
+
+app.post('/api/admin/students', requireAdmin, async (req, res) => {
+  try {
+    const { name, course } = req.body || {};
+    if (!name || !name.trim()) {
+      return res.status(400).json({ ok: false, message: 'Student name is required.' });
+    }
+
+    const student = await createStudent(req.body);
+    res.status(201).json({ ok: true, data: student, message: `Student ${student.name} enrolled with Roll No ${student.rollNo}` });
+  } catch (err) {
+    console.error('[admin] create student error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to enroll student.' });
+  }
+});
+
+app.put('/api/admin/students/:id', requireAdmin, async (req, res) => {
+  try {
+    const updated = await updateStudent(req.params.id, req.body);
+    if (!updated) {
+      return res.status(404).json({ ok: false, message: 'Student not found.' });
+    }
+    res.json({ ok: true, data: updated, message: 'Student updated successfully.' });
+  } catch (err) {
+    console.error('[admin] update student error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to update student.' });
+  }
+});
+
+app.delete('/api/admin/students/:id', requireAdmin, async (req, res) => {
+  try {
+    const deleted = await deleteStudent(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ ok: false, message: 'Student not found.' });
+    }
+    res.json({ ok: true, message: 'Student deleted successfully.' });
+  } catch (err) {
+    console.error('[admin] delete student error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to delete student.' });
+  }
+});
+
+/* -------------------------------------------------------------------------- */
+/* Fees Collection & Alert Endpoints                                          */
+/* -------------------------------------------------------------------------- */
+
+app.get('/api/admin/fees', requireAdmin, async (req, res) => {
+  try {
+    const fees = await getAllFees();
+    res.json({ ok: true, count: fees.length, data: fees });
+  } catch (err) {
+    console.error('[admin] get fees error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to fetch fee records.' });
+  }
+});
+
+app.post('/api/admin/fees/collect', requireAdmin, async (req, res) => {
+  try {
+    const { amount, studentId, rollNo } = req.body || {};
+    if (!amount || (!studentId && !rollNo)) {
+      return res.status(400).json({ ok: false, message: 'Student and valid amount are required.' });
+    }
+
+    const payment = await recordFeePayment(req.body);
+    res.status(201).json({
+      ok: true,
+      data: payment,
+      message: `Fee of ₹${payment.amount} recorded for ${payment.studentName} (Receipt: ${payment.receiptNo})`,
+    });
+  } catch (err) {
+    console.error('[admin] collect fee error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to record fee payment.' });
+  }
+});
+
+app.get('/api/admin/fees/alerts', requireAdmin, async (req, res) => {
+  try {
+    const alerts = await getFeeAlerts();
+    res.json({ ok: true, data: alerts });
+  } catch (err) {
+    console.error('[admin] fee alerts error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to calculate fee alerts.' });
+  }
+});
+
+app.post('/api/admin/fees/send-reminders', requireAdmin, async (req, res) => {
+  try {
+    const alerts = await getFeeAlerts();
+    const result = await deliverFeeAlertEmail(alerts);
+
+    res.json({
+      ok: true,
+      delivered: result.delivered,
+      transport: result.transport,
+      count: result.count,
+      upcomingCount: alerts.upcoming.length,
+      overdueCount: alerts.overdue.length,
+      message: result.delivered
+        ? `Fee alert digest emailed for ${alerts.upcoming.length} upcoming and ${alerts.overdue.length} overdue fees.`
+        : `Fee digest logged (${alerts.upcoming.length} upcoming, ${alerts.overdue.length} overdue fees).`,
+    });
+  } catch (err) {
+    console.error('[admin] send reminders error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to dispatch fee reminder emails.' });
+  }
+});
+
+/* -------------------------------------------------------------------------- */
+/* Attendance Endpoints (Admin Batch & Student Self Check-in)                  */
+/* -------------------------------------------------------------------------- */
+
+app.get('/api/admin/attendance', requireAdmin, async (req, res) => {
+  try {
+    const date = req.query.date || new Date().toISOString().slice(0, 10);
+    const records = await getAttendance(date);
+    res.json({ ok: true, date, data: records });
+  } catch (err) {
+    console.error('[admin] get attendance error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to fetch attendance.' });
+  }
+});
+
+app.post('/api/admin/attendance/batch', requireAdmin, async (req, res) => {
+  try {
+    const { date, records } = req.body || {};
+    if (!date || !Array.isArray(records)) {
+      return res.status(400).json({ ok: false, message: 'Date and records array are required.' });
+    }
+
+    const saved = await saveAttendanceBatch(date, records);
+    res.json({ ok: true, date, count: saved.length, message: `Attendance saved for ${saved.length} students.` });
+  } catch (err) {
+    console.error('[admin] save attendance error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to save attendance.' });
+  }
+});
+
+// Student Self Check-in (Public)
+app.post('/api/attendance/check-in', async (req, res) => {
+  try {
+    const { identifier } = req.body || {};
+    if (!identifier || !String(identifier).trim()) {
+      return res.status(400).json({ ok: false, message: 'Please enter your Roll Number or Registered Phone Number.' });
+    }
+
+    const result = await studentSelfCheckIn(identifier);
+    if (!result.ok) {
+      return res.status(404).json(result);
+    }
+
+    res.json(result);
+  } catch (err) {
+    console.error('[check-in] error:', err);
+    res.status(500).json({ ok: false, message: 'Check-in failed. Please try again.' });
+  }
+});
+
+/* -------------------------------------------------------------------------- */
+/* Website Enquiries Admin Viewer                                             */
+/* -------------------------------------------------------------------------- */
+
+app.get('/api/admin/enquiries', requireAdmin, async (req, res) => {
+  try {
+    const enquiries = await readEnquiries();
+    res.json({ ok: true, count: enquiries.length, data: enquiries.reverse() });
+  } catch (err) {
+    console.error('[admin] get enquiries error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to fetch enquiries.' });
+  }
 });
 
 /* -------------------------------------------------------------------------- */
