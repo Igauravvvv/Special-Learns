@@ -6,3 +6,5 @@ server/data/*.json
 *.local
 
 server/data/*.ndjson
+.vercel
+.env*
