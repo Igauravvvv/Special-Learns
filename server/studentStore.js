@@ -344,6 +344,7 @@ export async function recordFeePayment(data) {
     studentId: student ? student.id : data.studentId || '',
     rollNo: student ? student.rollNo : data.rollNo || '',
     studentName: student ? student.name : data.studentName || 'Student',
+    course: student ? student.course : data.course || '',
     amount: Number(data.amount) || 0,
     paymentDate: data.paymentDate || new Date().toISOString().slice(0, 10),
     forMonth: data.forMonth || new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),

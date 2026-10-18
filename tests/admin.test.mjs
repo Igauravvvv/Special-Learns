@@ -142,4 +142,15 @@ test('student admission, fee collection, fee alerts, and attendance', async () =
   assert.equal(overview.status, 200);
   assert.ok(overview.body.data.totalStudents > 0);
   assert.ok(overview.body.data.monthlyCollection > 0);
+
+  // 7. Test attendance history and CSV export
+  const allAtt = await request('/api/admin/attendance?all=true', { headers });
+  assert.equal(allAtt.status, 200);
+  assert.ok(Array.isArray(allAtt.body.data));
+
+  const csvExport = await request('/api/admin/attendance/export?date=all', { headers });
+  assert.equal(csvExport.status, 200);
+  assert.ok(typeof csvExport.body === 'string');
+  assert.ok(csvExport.body.includes('Special Learns Institute'));
+  assert.ok(csvExport.body.includes('Attendance Status'));
 });

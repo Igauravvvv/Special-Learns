@@ -24,8 +24,12 @@ import {
   Layers,
   Send,
   X,
+  Download,
 } from 'lucide-react';
 import Seo from '../components/Seo.jsx';
+import { brand } from '../data/site.js';
+import { downloadFeeReceiptPdf, numberToIndianWords } from '../utils/feeReceiptPdf.js';
+import { exportDailyAttendanceCsv, exportHistoricalAttendanceCsv } from '../utils/attendanceExport.js';
 
 const COURSE_OPTIONS = [
   'Web Design & Development',
@@ -55,6 +59,8 @@ export default function Admin() {
   const [feeAlerts, setFeeAlerts] = useState(null);
   const [attendanceDate, setAttendanceDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [attendanceRecords, setAttendanceRecords] = useState({});
+  const [serverAttendance, setServerAttendance] = useState([]);
+  const [attendanceFilter, setAttendanceFilter] = useState('all'); // all | present | absent | late | absent_late
   const [enquiries, setEnquiries] = useState([]);
 
   // Search & Filter
@@ -66,6 +72,7 @@ export default function Admin() {
   const [showFeeModal, setShowFeeModal] = useState(false);
   const [selectedStudentForFee, setSelectedStudentForFee] = useState(null);
   const [receiptToPrint, setReceiptToPrint] = useState(null);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
 
   // Admission Form State
@@ -150,6 +157,7 @@ export default function Admin() {
       if (resEnquiries.ok) setEnquiries(resEnquiries.data || []);
 
       if (resAttendance.ok && Array.isArray(resAttendance.data)) {
+        setServerAttendance(resAttendance.data);
         const attMap = {};
         resAttendance.data.forEach((item) => {
           attMap[item.studentId] = item.status;
@@ -174,6 +182,7 @@ export default function Admin() {
       .then((r) => r.json())
       .then((res) => {
         if (res.ok && Array.isArray(res.data)) {
+          setServerAttendance(res.data);
           const attMap = {};
           res.data.forEach((item) => {
             attMap[item.studentId] = item.status;
@@ -317,6 +326,40 @@ export default function Admin() {
       }
     } catch (err) {
       alert('Failed to save attendance.');
+    }
+  };
+
+  // Download Attendance CSV
+  const handleDownloadAttendance = () => {
+    try {
+      const result = exportDailyAttendanceCsv({
+        students,
+        attendanceRecords,
+        date: attendanceDate,
+        filterStatus: attendanceFilter,
+        serverRecords: serverAttendance,
+      });
+      setStatusMessage(`✅ Exported ${result.count} attendance records for ${dateFormatted(attendanceDate)} (CSV)`);
+    } catch (err) {
+      console.error('Attendance download failed:', err);
+      alert('Could not download attendance CSV.');
+    }
+  };
+
+  // Download Full Attendance History CSV
+  const handleDownloadHistoricalAttendance = async () => {
+    try {
+      setStatusMessage('⏳ Fetching complete historical attendance register...');
+      const res = await fetch('/api/admin/attendance?all=true', { headers: authHeaders }).then((r) => r.json());
+      if (res.ok && Array.isArray(res.data)) {
+        const result = exportHistoricalAttendanceCsv(res.data, students);
+        setStatusMessage(`✅ Exported ${result.count} historical attendance records to CSV!`);
+      } else {
+        alert('Could not fetch historical attendance.');
+      }
+    } catch (err) {
+      console.error('Historical attendance error:', err);
+      alert('Failed to export complete attendance history.');
     }
   };
 
@@ -1062,113 +1105,242 @@ export default function Admin() {
         {/* ================================================================== */}
         {/* TAB 4: ATTENDANCE MANAGEMENT                                       */}
         {/* ================================================================== */}
-        {activeTab === 'attendance' && (
-          <div className="admin-panel-card">
-            <div className="admin-panel-card__header">
-              <div>
-                <h2 className="admin-panel-card__title">Attendance Register</h2>
-                <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'var(--sl-text-muted)' }}>
-                  Mark present/absent for classroom batches or view self-check-ins from the student kiosk.
-                </p>
+        {activeTab === 'attendance' && (() => {
+          const presentCount = students.filter((s) => (attendanceRecords[s.id] || 'present') === 'present').length;
+          const absentCount = students.filter((s) => attendanceRecords[s.id] === 'absent').length;
+          const lateCount = students.filter((s) => attendanceRecords[s.id] === 'late').length;
+
+          const displayedStudents = students.filter((s) => {
+            const st = attendanceRecords[s.id] || 'present';
+            if (attendanceFilter === 'present') return st === 'present';
+            if (attendanceFilter === 'absent') return st === 'absent';
+            if (attendanceFilter === 'late') return st === 'late';
+            if (attendanceFilter === 'absent_late') return st === 'absent' || st === 'late';
+            return true;
+          });
+
+          return (
+            <div className="admin-panel-card">
+              <div className="admin-panel-card__header">
+                <div>
+                  <h2 className="admin-panel-card__title">Attendance Register</h2>
+                  <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'var(--sl-text-muted)' }}>
+                    Mark present/absent/late for student batches, view kiosk check-ins, or export attendance reports.
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  <input
+                    type="date"
+                    className="admin-form-input"
+                    value={attendanceDate}
+                    onChange={(e) => setAttendanceDate(e.target.value)}
+                    style={{ width: 'auto' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSaveAttendance}
+                    className="admin-btn admin-btn--primary"
+                  >
+                    <CheckCircle2 size={16} />
+                    Save Register
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleDownloadAttendance}
+                    className="admin-btn admin-btn--success"
+                    style={{ gap: 6 }}
+                    title="Export attendance records as CSV for Excel/Sheets"
+                  >
+                    <Download size={16} />
+                    Download Attendance (CSV)
+                  </button>
+                </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <input
-                  type="date"
-                  className="admin-form-input"
-                  value={attendanceDate}
-                  onChange={(e) => setAttendanceDate(e.target.value)}
-                  style={{ width: 'auto' }}
-                />
-                <button
-                  type="button"
-                  onClick={handleSaveAttendance}
-                  className="admin-btn admin-btn--primary"
-                >
-                  <CheckCircle2 size={16} />
-                  Save Register
-                </button>
+              {/* Status Filter Bar & Batch Quick Actions */}
+              <div
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: '#f8fafc',
+                  borderBottom: '1px solid var(--sl-line)',
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: '12px',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--sl-text-muted)', marginRight: 4 }}>
+                    Filter:
+                  </span>
+                  <button
+                    type="button"
+                    className={`admin-btn admin-btn--sm ${attendanceFilter === 'all' ? 'admin-btn--primary' : 'admin-btn--secondary'}`}
+                    onClick={() => setAttendanceFilter('all')}
+                  >
+                    All ({students.length})
+                  </button>
+                  <button
+                    type="button"
+                    className={`admin-btn admin-btn--sm ${attendanceFilter === 'present' ? 'admin-btn--success' : 'admin-btn--secondary'}`}
+                    onClick={() => setAttendanceFilter('present')}
+                  >
+                    Present ({presentCount})
+                  </button>
+                  <button
+                    type="button"
+                    className={`admin-btn admin-btn--sm ${attendanceFilter === 'absent' ? 'admin-btn--danger' : 'admin-btn--secondary'}`}
+                    onClick={() => setAttendanceFilter('absent')}
+                  >
+                    Absent ({absentCount})
+                  </button>
+                  <button
+                    type="button"
+                    className={`admin-btn admin-btn--sm ${attendanceFilter === 'late' ? 'admin-btn--primary' : 'admin-btn--secondary'}`}
+                    onClick={() => setAttendanceFilter('late')}
+                  >
+                    Late ({lateCount})
+                  </button>
+                  <button
+                    type="button"
+                    className={`admin-btn admin-btn--sm ${attendanceFilter === 'absent_late' ? 'admin-btn--danger' : 'admin-btn--secondary'}`}
+                    onClick={() => setAttendanceFilter('absent_late')}
+                    title="Filter to only absent or late students"
+                  >
+                    Absent & Late ({absentCount + lateCount})
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--sl-text-muted)' }}>Quick:</span>
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn--secondary admin-btn--sm"
+                    onClick={() => {
+                      const m = {};
+                      students.forEach((s) => (m[s.id] = 'present'));
+                      setAttendanceRecords(m);
+                    }}
+                  >
+                    Mark All Present
+                  </button>
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn--secondary admin-btn--sm"
+                    onClick={() => {
+                      const m = {};
+                      students.forEach((s) => (m[s.id] = 'absent'));
+                      setAttendanceRecords(m);
+                    }}
+                  >
+                    Mark All Absent
+                  </button>
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn--secondary admin-btn--sm"
+                    onClick={handleDownloadHistoricalAttendance}
+                    title="Export complete multi-day attendance history as CSV"
+                  >
+                    <Download size={13} />
+                    Full History CSV
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {/* Batch Helpers */}
-            <div style={{ padding: '0.75rem 1.5rem', background: '#f8fafc', borderBottom: '1px solid var(--sl-line)', display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--sl-text-muted)' }}>Quick Actions:</span>
-              <button
-                type="button"
-                className="admin-btn admin-btn--secondary admin-btn--sm"
-                onClick={() => {
-                  const m = {};
-                  students.forEach((s) => (m[s.id] = 'present'));
-                  setAttendanceRecords(m);
-                }}
-              >
-                Mark All Present
-              </button>
-              <button
-                type="button"
-                className="admin-btn admin-btn--secondary admin-btn--sm"
-                onClick={() => {
-                  const m = {};
-                  students.forEach((s) => (m[s.id] = 'absent'));
-                  setAttendanceRecords(m);
-                }}
-              >
-                Mark All Absent
-              </button>
-            </div>
-
-            <div className="admin-table-container">
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th>Roll No</th>
-                    <th>Student Name</th>
-                    <th>Course</th>
-                    <th>Today's Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {students.map((s) => {
-                    const currentStatus = attendanceRecords[s.id] || 'present';
-                    return (
-                      <tr key={s.id}>
-                        <td><code>{s.rollNo}</code></td>
-                        <td><strong>{s.name}</strong></td>
-                        <td><small>{s.course}</small></td>
-                        <td>
-                          <div style={{ display: 'inline-flex', gap: '6px' }}>
-                            <button
-                              type="button"
-                              onClick={() => setAttendanceRecords((prev) => ({ ...prev, [s.id]: 'present' }))}
-                              className={`admin-btn admin-btn--sm ${currentStatus === 'present' ? 'admin-btn--success' : 'admin-btn--secondary'}`}
-                            >
-                              Present
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setAttendanceRecords((prev) => ({ ...prev, [s.id]: 'absent' }))}
-                              className={`admin-btn admin-btn--sm ${currentStatus === 'absent' ? 'admin-btn--danger' : 'admin-btn--secondary'}`}
-                            >
-                              Absent
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setAttendanceRecords((prev) => ({ ...prev, [s.id]: 'late' }))}
-                              className={`admin-btn admin-btn--sm ${currentStatus === 'late' ? 'admin-btn--primary' : 'admin-btn--secondary'}`}
-                            >
-                              Late
-                            </button>
-                          </div>
-                        </td>
+              <div className="admin-table-container">
+                {displayedStudents.length === 0 ? (
+                  <div style={{ padding: '3rem 1.5rem', textAlign: 'center', color: 'var(--sl-text-muted)' }}>
+                    <p style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>No students match this filter.</p>
+                    <p style={{ margin: '6px 0 0', fontSize: '0.85rem' }}>
+                      There are currently no students marked as <strong>{attendanceFilter.replace('_', ' & ')}</strong> for this date.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setAttendanceFilter('all')}
+                      className="admin-btn admin-btn--secondary admin-btn--sm"
+                      style={{ marginTop: 12 }}
+                    >
+                      Show All Students
+                    </button>
+                  </div>
+                ) : (
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Roll No</th>
+                        <th>Student Name</th>
+                        <th>Course</th>
+                        <th>Phone</th>
+                        <th>Today's Status</th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                    </thead>
+                    <tbody>
+                      {displayedStudents.map((s) => {
+                        const currentStatus = attendanceRecords[s.id] || 'present';
+                        const srvRec = serverAttendance.find((r) => r.studentId === s.id || r.rollNo === s.rollNo);
+                        return (
+                          <tr key={s.id}>
+                            <td><code>{s.rollNo}</code></td>
+                            <td>
+                              <strong>{s.name}</strong>
+                              {srvRec && srvRec.source === 'student' && (
+                                <span
+                                  style={{
+                                    display: 'inline-block',
+                                    marginLeft: 8,
+                                    fontSize: '0.68rem',
+                                    padding: '1px 6px',
+                                    background: '#ecfdf5',
+                                    color: '#065f46',
+                                    borderRadius: 4,
+                                    fontWeight: 700,
+                                  }}
+                                  title={`Self-checked in at ${new Date(srvRec.timestamp).toLocaleTimeString()}`}
+                                >
+                                  Kiosk Check-in
+                                </span>
+                              )}
+                            </td>
+                            <td><small>{s.course}</small></td>
+                            <td><small style={{ color: 'var(--sl-text-muted)' }}>{s.phone || '—'}</small></td>
+                            <td>
+                              <div style={{ display: 'inline-flex', gap: '6px' }}>
+                                <button
+                                  type="button"
+                                  onClick={() => setAttendanceRecords((prev) => ({ ...prev, [s.id]: 'present' }))}
+                                  className={`admin-btn admin-btn--sm ${currentStatus === 'present' ? 'admin-btn--success' : 'admin-btn--secondary'}`}
+                                >
+                                  Present
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setAttendanceRecords((prev) => ({ ...prev, [s.id]: 'absent' }))}
+                                  className={`admin-btn admin-btn--sm ${currentStatus === 'absent' ? 'admin-btn--danger' : 'admin-btn--secondary'}`}
+                                >
+                                  Absent
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setAttendanceRecords((prev) => ({ ...prev, [s.id]: 'late' }))}
+                                  className={`admin-btn admin-btn--sm ${currentStatus === 'late' ? 'admin-btn--primary' : 'admin-btn--secondary'}`}
+                                >
+                                  Late
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* ================================================================== */}
         {/* TAB 5: WEBSITE ENQUIRIES                                           */}
@@ -1608,90 +1780,173 @@ export default function Admin() {
       )}
 
       {/* ==================================================================== */}
-      {/* MODAL: PRINTABLE RECEIPT PREVIEW                                     */}
+      {/* MODAL: PRINTABLE RECEIPT PREVIEW WITH LOGO & PDF DOWNLOAD             */}
       {/* ==================================================================== */}
-      {receiptToPrint && (
-        <div className="admin-modal-backdrop" onClick={() => setReceiptToPrint(null)}>
-          <div className="admin-modal" style={{ maxWidth: 540 }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ padding: '24px', background: '#ffffff', border: '2px solid #e2e8f0', borderRadius: '12px' }}>
-              {/* Receipt Header */}
-              <div style={{ textAlign: 'center', borderBottom: '2px dashed #cbd5e1', paddingBottom: '16px', marginBottom: '16px' }}>
-                <h3 style={{ margin: '0 0 4px', fontSize: '1.4rem', color: '#1e293b' }}>Special Learns Institute</h3>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}>
-                  K-3, Mohan Garden, 40 Feet Road, Uttam Nagar, New Delhi 110059
-                </p>
-                <span style={{ display: 'inline-block', marginTop: 8, padding: '2px 10px', background: '#ecfdf5', color: '#065f46', borderRadius: 999, fontSize: '0.75rem', fontWeight: 800 }}>
-                  OFFICIAL FEE RECEIPT
-                </span>
-              </div>
+      {receiptToPrint && (() => {
+        const studentInfo = students.find((s) => s.id === receiptToPrint.studentId || s.rollNo === receiptToPrint.rollNo) || {};
+        const courseName = receiptToPrint.course || studentInfo.course || 'Computer Science / Academic Course';
 
-              {/* Receipt Details */}
-              <table style={{ width: '100%', fontSize: '0.88rem', borderCollapse: 'collapse', marginBottom: '16px' }}>
-                <tbody>
-                  <tr>
-                    <td style={{ padding: '6px 0', color: '#64748b' }}>Receipt No:</td>
-                    <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 700 }}><code>{receiptToPrint.receiptNo}</code></td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '6px 0', color: '#64748b' }}>Date:</td>
-                    <td style={{ padding: '6px 0', textAlign: 'right' }}>{dateFormatted(receiptToPrint.paymentDate)}</td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '6px 0', color: '#64748b' }}>Student Name:</td>
-                    <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 700 }}>{receiptToPrint.studentName}</td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '6px 0', color: '#64748b' }}>Roll Number:</td>
-                    <td style={{ padding: '6px 0', textAlign: 'right' }}><code>{receiptToPrint.rollNo}</code></td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '6px 0', color: '#64748b' }}>Month:</td>
-                    <td style={{ padding: '6px 0', textAlign: 'right' }}>{receiptToPrint.forMonth}</td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '6px 0', color: '#64748b' }}>Payment Mode:</td>
-                    <td style={{ padding: '6px 0', textAlign: 'right' }}>{receiptToPrint.paymentMode}</td>
-                  </tr>
-                  {receiptToPrint.notes && (
-                    <tr>
-                      <td style={{ padding: '6px 0', color: '#64748b' }}>Remarks:</td>
-                      <td style={{ padding: '6px 0', textAlign: 'right', fontSize: '0.8rem' }}>{receiptToPrint.notes}</td>
+        return (
+          <div className="admin-modal-backdrop" onClick={() => setReceiptToPrint(null)}>
+            <div className="admin-modal" style={{ maxWidth: 580 }} onClick={(e) => e.stopPropagation()}>
+              <div
+                id="fee-receipt-printable"
+                style={{
+                  padding: '24px',
+                  background: '#ffffff',
+                  border: '2px solid #0f172a',
+                  borderRadius: '12px',
+                  boxShadow: '0 10px 25px -5px rgba(0,0,0,0.08)',
+                }}
+              >
+                {/* Receipt Header with Institute Logo on Top */}
+                <div style={{ textAlign: 'center', borderBottom: '2px solid #e2e8f0', paddingBottom: '16px', marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px', marginBottom: '8px' }}>
+                    <img
+                      src={brand.logoFull || '/brand/logo-full.png'}
+                      alt="Special Learns Institute"
+                      style={{ maxHeight: 52, maxWidth: 180, objectFit: 'contain' }}
+                    />
+                    <div style={{ textAlign: 'left' }}>
+                      <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.01em' }}>
+                        Special Learns Institute
+                      </h3>
+                      <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: '#64748b' }}>
+                        Premier Center for Computer Science & Academics
+                      </p>
+                    </div>
+                  </div>
+
+                  <p style={{ margin: '4px 0 0', fontSize: '0.76rem', color: '#64748b', lineHeight: 1.4 }}>
+                    K-3, Mohan Garden, 40 Feet Road, Near R.P Memorial School, Uttam Nagar, New Delhi 110059<br />
+                    Ph: +91 85271 84745, +91 88106 88775 | Email: info@speciallearns.in | speciallearns.in
+                  </p>
+
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '12px' }}>
+                    <span style={{ padding: '3px 12px', background: '#0f172a', color: '#ffffff', borderRadius: 999, fontSize: '0.74rem', fontWeight: 700, letterSpacing: '0.03em' }}>
+                      OFFICIAL FEE RECEIPT
+                    </span>
+                    <span style={{ padding: '3px 12px', background: '#ecfdf5', color: '#065f46', borderRadius: 999, fontSize: '0.74rem', fontWeight: 700, border: '1px solid #a7f3d0' }}>
+                      ✓ PAID & ACKNOWLEDGED
+                    </span>
+                  </div>
+                </div>
+
+                {/* Receipt Details Table */}
+                <table style={{ width: '100%', fontSize: '0.86rem', borderCollapse: 'collapse', marginBottom: '14px' }}>
+                  <tbody>
+                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '6px 0', color: '#64748b' }}>Receipt No:</td>
+                      <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 700 }}><code>{receiptToPrint.receiptNo}</code></td>
                     </tr>
-                  )}
-                  <tr style={{ borderTop: '2px solid #0f172a' }}>
-                    <td style={{ padding: '12px 0 6px', fontWeight: 800, fontSize: '1.1rem' }}>Total Amount Paid:</td>
-                    <td style={{ padding: '12px 0 6px', textAlign: 'right', fontWeight: 800, fontSize: '1.25rem', color: '#059669' }}>
-                      ₹{receiptToPrint.amount}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '6px 0', color: '#64748b' }}>Receipt Date:</td>
+                      <td style={{ padding: '6px 0', textAlign: 'right' }}>{dateFormatted(receiptToPrint.paymentDate)}</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '6px 0', color: '#64748b' }}>Student Name:</td>
+                      <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 700, color: '#0f172a' }}>{receiptToPrint.studentName}</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '6px 0', color: '#64748b' }}>Roll Number:</td>
+                      <td style={{ padding: '6px 0', textAlign: 'right' }}><code>{receiptToPrint.rollNo}</code></td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '6px 0', color: '#64748b' }}>Course Enrolled:</td>
+                      <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 600 }}>{courseName}</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '6px 0', color: '#64748b' }}>Fee Month / Term:</td>
+                      <td style={{ padding: '6px 0', textAlign: 'right' }}>{receiptToPrint.forMonth}</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '6px 0', color: '#64748b' }}>Payment Mode:</td>
+                      <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 600 }}>{receiptToPrint.paymentMode}</td>
+                    </tr>
+                    {receiptToPrint.notes && (
+                      <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        <td style={{ padding: '6px 0', color: '#64748b' }}>Remarks:</td>
+                        <td style={{ padding: '6px 0', textAlign: 'right', fontSize: '0.8rem', color: '#475569' }}>{receiptToPrint.notes}</td>
+                      </tr>
+                    )}
+                    <tr style={{ borderTop: '2px solid #0f172a', background: '#f8fafc' }}>
+                      <td style={{ padding: '10px 8px', fontWeight: 800, fontSize: '0.98rem', color: '#0f172a' }}>
+                        Total Amount Paid:
+                      </td>
+                      <td style={{ padding: '10px 8px', textAlign: 'right', fontWeight: 800, fontSize: '1.25rem', color: '#059669' }}>
+                        ₹{Number(receiptToPrint.amount).toLocaleString('en-IN')}.00
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan={2} style={{ padding: '4px 8px 10px', fontSize: '0.78rem', color: '#64748b', fontStyle: 'italic', background: '#f8fafc' }}>
+                        Amount in words: Rupees {numberToIndianWords(receiptToPrint.amount)} Only
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
 
-              <div style={{ textAlign: 'center', fontSize: '0.75rem', color: '#94a3b8', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
-                Thank you for your payment! Keep this receipt for your records.
+                {/* Authentication Note & Signatory */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderTop: '1px dashed #cbd5e1', paddingTop: '12px', marginTop: '6px' }}>
+                  <div style={{ fontSize: '0.72rem', color: '#64748b', maxWidth: '62%' }}>
+                    <p style={{ margin: '0 0 2px', fontWeight: 700, color: '#059669' }}>✓ Digitally Verified via ERP Portal</p>
+                    <p style={{ margin: 0 }}>Valid without physical signature if verified online at speciallearns.vercel.app</p>
+                  </div>
+                  <div style={{ textAlign: 'center', borderTop: '1px solid #64748b', paddingTop: '4px', minWidth: '120px' }}>
+                    <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#0f172a' }}>Authorized Signatory</span>
+                    <br />
+                    <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Special Learns Accounts</span>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.25rem' }}>
-              <button
-                type="button"
-                onClick={() => setReceiptToPrint(null)}
-                className="admin-btn admin-btn--secondary"
-              >
-                Close
-              </button>
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className="admin-btn admin-btn--primary"
-              >
-                <Printer size={16} />
-                Print Receipt
-              </button>
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.25rem', gap: '10px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => setReceiptToPrint(null)}
+                  className="admin-btn admin-btn--secondary"
+                >
+                  Close
+                </button>
+
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setIsGeneratingPdf(true);
+                      try {
+                        await downloadFeeReceiptPdf(receiptToPrint, studentInfo);
+                        setStatusMessage(`✅ Receipt ${receiptToPrint.receiptNo} PDF downloaded successfully!`);
+                      } catch (err) {
+                        console.error('PDF generation error:', err);
+                        alert('Failed to generate PDF. Please use the Print option.');
+                      } finally {
+                        setIsGeneratingPdf(false);
+                      }
+                    }}
+                    disabled={isGeneratingPdf}
+                    className="admin-btn admin-btn--success"
+                    style={{ gap: 6 }}
+                  >
+                    <Download size={16} />
+                    {isGeneratingPdf ? 'Generating PDF...' : 'Download PDF'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="admin-btn admin-btn--primary"
+                    style={{ gap: 6 }}
+                  >
+                    <Printer size={16} />
+                    Print Receipt
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

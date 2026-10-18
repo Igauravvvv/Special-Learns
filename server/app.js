@@ -15,6 +15,7 @@ import {
   recordFeePayment,
   getFeeAlerts,
   getAttendance,
+  getAllAttendanceRecords,
   saveAttendanceBatch,
   studentSelfCheckIn,
   getDashboardOverview,
@@ -248,12 +249,92 @@ app.post('/api/admin/fees/send-reminders', requireAdmin, async (req, res) => {
 
 app.get('/api/admin/attendance', requireAdmin, async (req, res) => {
   try {
-    const date = req.query.date || new Date().toISOString().slice(0, 10);
-    const records = await getAttendance(date);
-    res.json({ ok: true, date, data: records });
+    const { date, all, status } = req.query;
+    let records;
+    if (all === 'true' || date === 'all') {
+      records = await getAllAttendanceRecords();
+    } else {
+      const targetDate = date || new Date().toISOString().slice(0, 10);
+      records = await getAttendance(targetDate);
+    }
+
+    if (status && status !== 'all') {
+      if (status === 'absent_late') {
+        records = records.filter((r) => r.status === 'absent' || r.status === 'late');
+      } else {
+        records = records.filter((r) => r.status === status);
+      }
+    }
+
+    res.json({ ok: true, count: records.length, data: records });
   } catch (err) {
     console.error('[admin] get attendance error:', err);
     res.status(500).json({ ok: false, message: 'Failed to fetch attendance.' });
+  }
+});
+
+app.get('/api/admin/attendance/export', requireAdmin, async (req, res) => {
+  try {
+    const { date, all, status } = req.query;
+    let records;
+    if (all === 'true' || date === 'all') {
+      records = await getAllAttendanceRecords();
+    } else {
+      const targetDate = date || new Date().toISOString().slice(0, 10);
+      records = await getAttendance(targetDate);
+    }
+
+    if (status && status !== 'all') {
+      if (status === 'absent_late') {
+        records = records.filter((r) => r.status === 'absent' || r.status === 'late');
+      } else {
+        records = records.filter((r) => r.status === status);
+      }
+    }
+
+    const students = await getAllStudents();
+    const studentMap = new Map();
+    for (const s of students) {
+      studentMap.set(s.id, s);
+      studentMap.set(s.rollNo, s);
+    }
+
+    const escapeCsv = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const lines = [
+      `# Special Learns Institute — Attendance Export`,
+      `# Date: ${date || 'All Dates'} | Status Filter: ${(status || 'All').toUpperCase()} | Total Records: ${records.length}`,
+      ``,
+      [
+        escapeCsv('Date'),
+        escapeCsv('Roll Number'),
+        escapeCsv('Student Name'),
+        escapeCsv('Course'),
+        escapeCsv('Attendance Status'),
+        escapeCsv('Marked Source'),
+        escapeCsv('Timestamp'),
+      ].join(','),
+    ];
+
+    for (const r of records) {
+      const stu = studentMap.get(r.studentId) || studentMap.get(r.rollNo);
+      lines.push([
+        escapeCsv(r.date || ''),
+        escapeCsv(r.rollNo || stu?.rollNo || ''),
+        escapeCsv(r.studentName || stu?.name || ''),
+        escapeCsv(stu?.course || ''),
+        escapeCsv((r.status || 'present').toUpperCase()),
+        escapeCsv(r.source === 'student' ? 'Student Kiosk' : 'Admin Register'),
+        escapeCsv(r.timestamp || ''),
+      ].join(','));
+    }
+
+    const filename = `SpecialLearns_Attendance_${date || 'all'}_${status || 'all'}.csv`;
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send('\uFEFF' + lines.join('\r\n'));
+  } catch (err) {
+    console.error('[admin] export attendance error:', err);
+    res.status(500).json({ ok: false, message: 'Failed to export attendance CSV.' });
   }
 });
 
